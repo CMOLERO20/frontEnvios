@@ -54,7 +54,7 @@ zona: name === "localidad" ? localidades[value] || "" : prev.zona,
 };
 
 const agregarEnvio = () => {
-if (!form.recieverName || !form.recieverPhone || !form.recieverAddress || !form.localidad || !form.zona) {
+if (!form.recieverName || !form.recieverAddress || !form.localidad || !form.zona) {
 return alert("Faltan campos obligatorios del destinatario o destino.");
 }
 const precio = obtenerPrecioPorZona(form.zona);

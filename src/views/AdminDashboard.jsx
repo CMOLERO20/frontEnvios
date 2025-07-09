@@ -140,6 +140,12 @@ export default function AdminDashboard() {
     Lector de Etiquetas
   </button>
   <button
+    onClick={() => navigate("/admin/crear-envios-ocr-v2")}
+    className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+  >
+    Lector de Etiquetas V2
+  </button>
+  <button
     onClick={() => navigate("/admin/crear-multiples")}
     className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition"
   >

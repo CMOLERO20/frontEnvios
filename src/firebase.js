@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import {  getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import {
     collection,
@@ -27,6 +28,7 @@ const firebaseConfig = {
 
 
 const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
 export const db = getFirestore(app);
 export const auth = getAuth(app);
@@ -69,3 +71,5 @@ export async function crearEnvio({ clienteId, clienteNombre, direccion }) {
     const docRef = doc(db, "envios", id);
     return await deleteDoc(docRef);
   }
+
+  export {storage}

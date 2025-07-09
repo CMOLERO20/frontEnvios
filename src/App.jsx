@@ -16,6 +16,7 @@ import { auth } from "./firebase";
 import CrearCliente from "./views/CrearCliente";
 import CrearEnviosMultiples from "./components/CrearEnviosMultiples";
 import CrearEnviosOCR from "./views/CrearEnviosOCR";
+import CrearEnviosOCRV2 from "./views/CrearEnviosOCRV2";
 
 import dotenv from 'dotenv';
 
@@ -40,6 +41,7 @@ export default function App() {
         />
 <Route path="/admin/crear-multiples" element={<CrearEnviosMultiples />} />
 <Route path="/admin/crear-envios-ocr" element={<CrearEnviosOCR />} />
+<Route path="/admin/crear-envios-ocr-v2" element={<CrearEnviosOCRV2 />} />
  <Route
           path="/crear-envio"
           element={
