@@ -42,41 +42,61 @@ export default function CamaraEtiquetas({ onFotosCapturadas }) {
     const blob = await new Promise((resolve) =>
       canvas.toBlob(resolve, "image/jpeg", 0.8)
     );
-
-    if (!blob) return;
-
     const previewUrl = URL.createObjectURL(blob);
 
-    const nuevaImagen = { blob, previewUrl };
-    const nuevas = [...imagenes, nuevaImagen];
+    const nuevas = [...imagenes, { blob, previewUrl }];
     setImagenes(nuevas);
-    onFotosCapturadas(nuevas); // envia array de { blob, previewUrl }
+    onFotosCapturadas(nuevas);
+  };
+
+  const eliminarFoto = (index) => {
+    const nuevas = imagenes.filter((_, i) => i !== index);
+    setImagenes(nuevas);
+    onFotosCapturadas(nuevas);
   };
 
   return (
-    <div className="p-4 bg-white rounded shadow">
-      <h3 className="font-semibold text-gray-800 mb-2">Capturar fotos de etiquetas</h3>
-      {error && <p className="text-red-600 text-sm">{error}</p>}
-
-      <div className="relative w-full aspect-video rounded overflow-hidden border mb-3">
-        <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
+    <div className="w-full">
+      <div className="relative w-full aspect-[3/4] bg-black rounded-lg overflow-hidden mb-4">
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          className="w-full h-full object-cover"
+        />
         <canvas ref={canvasRef} className="hidden" />
+        {error && (
+          <p className="absolute top-0 left-0 right-0 text-center text-red-500 bg-white py-2 text-sm">
+            {error}
+          </p>
+        )}
       </div>
 
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex justify-between items-center mb-4">
         <button
           onClick={capturarFoto}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition w-full"
         >
-          Capturar Foto
+          📸 Capturar Foto
         </button>
-        <span className="text-sm text-gray-700">Fotos tomadas: {imagenes.length}</span>
       </div>
 
       {imagenes.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 mt-2">
+        <div className="grid grid-cols-3 gap-2">
           {imagenes.map((img, idx) => (
-            <img key={idx} src={img.previewUrl} alt={`captura-${idx}`} className="w-full h-auto rounded border" />
+            <div key={idx} className="relative">
+              <img
+                src={img.previewUrl}
+                alt={`foto-${idx}`}
+                className="w-full h-auto rounded border"
+              />
+              <button
+                onClick={() => eliminarFoto(idx)}
+                className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 py-0.5 rounded hover:bg-red-700"
+              >
+                ✕
+              </button>
+            </div>
           ))}
         </div>
       )}

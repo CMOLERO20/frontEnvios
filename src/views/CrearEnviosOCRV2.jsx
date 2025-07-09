@@ -6,7 +6,7 @@ import OCRMultipleEnviosV2 from "../components/OCRMultipleEnviosV2";
 import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 import { getClients } from "../utils/getClients";
 import { useNavigate } from "react-router-dom";
-
+import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 
 export default function CrearEnviosOCR() {
   const [enviosOCR, setEnviosOCR] = useState([]);
@@ -82,18 +82,24 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
-  <div className="bg-white shadow-md rounded-lg p-6">
-    <h2 className="text-2xl font-bold mb-4 text-gray-800">Cargar múltiples etiquetas</h2>
+        <div>  <button
+    onClick={() => navigate("/admin")}
+    className="absolute top-2 left-2 p-1 text-gray-600 hover:text-blue-600 transition"
+    title="Volver al dashboard"
+  >
+    <ArrowLeftIcon className="h-5 w-5" />
+  </button></div>
+   
 
-
-    <OCRMultipleEnviosV2 setEnvios={setEnviosOCR} />
-  </div>
+    {enviosOCR.length === 0 && (
+        <OCRMultipleEnviosV2 setEnvios={setEnviosOCR} />
+    )}
+   
+ 
 
   {enviosOCR.length > 0 && (
     <div className="bg-white shadow-md rounded-lg p-6 space-y-6">
-      <div className="mt-6 p-4 bg-gray-100 rounded-md flex justify-between items-center text-sm sm:text-base text-gray-800 shadow-sm">
-  
-    <label className="block text-sm font-medium text-gray-700 mb-1">Seleccionar remitente:</label>
+         <div><label className="block text-sm font-medium text-gray-700 mb-1">Seleccionar remitente:</label>
     <select
       className="border border-gray-300 rounded-md p-2 w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
       value={remitenteId}
@@ -105,7 +111,10 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
           {c.nombre || c.email}
         </option>
       ))}
-    </select>
+    </select></div>
+      <div className="mt-6 p-4 bg-gray-100 rounded-md flex justify-between items-center text-sm sm:text-base text-gray-800 shadow-sm">
+  
+    
   <div>
     <p><span className="font-medium">📦 Total de envíos:</span> {enviosOCR.length}</p>
   </div>
