@@ -57,9 +57,7 @@ export default function OCRMultipleEnvios({ setEnvios }) {
 
   return (
     <div className="p-6 bg-white rounded-md shadow-md border border-gray-200">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">
-        📸 Capturar y procesar etiquetas
-      </h2>
+    
 
       <CamaraEtiquetas onFotosCapturadas={setImagenes} />
 
