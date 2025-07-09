@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import  obtenerOrientacionPorLocalidad  from '../utils/obtenerOrientacionPorLocalidad';
 
 export default function FiltrosEnvios({
   envios,
@@ -14,6 +15,7 @@ export default function FiltrosEnvios({
   const [direccion, setDireccion] = useState("");
   const [cantidad, setCantidad] = useState(0);
  const [soloDemorados, setSoloDemorados] = useState(false);
+ const [orientacion, setOrientacion] = useState("");
 
   const limpiarFiltros = () => {
     setEstado("");
@@ -55,10 +57,16 @@ export default function FiltrosEnvios({
   if (soloDemorados) {
     filtrados = filtrados.filter((e) => e.demorado === true);
   }
+  if (orientacion) {
+  filtrados = filtrados.filter((e) => {
+    const ori = e.orientacion || obtenerOrientacionPorLocalidad(e.localidad);
+    return ori === orientacion;
+  });
+}
 
   setCantidad(filtrados.length);
   onFiltrar(filtrados);
-}, [estado, desde, hasta, remitente, direccion, envios, soloDemorados]);
+}, [estado, desde, hasta, remitente, direccion, envios, soloDemorados, orientacion]);
 
   return (
   <div className="mb-6 bg-white p-4 rounded-lg shadow-md">
@@ -104,6 +112,20 @@ export default function FiltrosEnvios({
         ></div>
       </div>
     </div>
+    <div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Orientación</label>
+  <select
+    value={orientacion}
+    onChange={(e) => setOrientacion(e.target.value)}
+    className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+  >
+    <option value="">Todas</option>
+    <option value="Norte">Norte</option>
+    <option value="Sur">Sur</option>
+    <option value="Oeste">Oeste</option>
+    <option value="Centro">Centro</option>
+  </select>
+</div>
   {showRemitente && (
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Remitente</label>

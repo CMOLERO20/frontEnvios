@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 @layer base {
-  input, textarea, table, th, td {
+  input, textarea, table, th, td , select{
     @apply text-gray-900 bg-white;
   }
 }
