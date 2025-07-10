@@ -52,34 +52,37 @@ useEffect(() => {
     }
 
     try {
-      for (const envio of enviosOCR) {
-        const precio = obtenerPrecioPorZona(envio.zona);
-        const docRef = await addDoc(collection(db, "envios"), {
-          ...envio,
-          senderId: remitenteId,
-          senderName: senderName || "",
-          precio,
-          demorado: false,
-          activo: true,
-          creado: Timestamp.now(),
-          estado: "Pendiente",
-          motoId: null,
-          motoName: "",
-          numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
-        });
+     for (const envio of enviosOCR) {
+  const precio = obtenerPrecioPorZona(envio.zona);
+  let fotoUrl = "";
 
-        await addDoc(collection(docRef, "historial"), {
-          estado: "Pendiente",
-          fecha: Timestamp.now(),
-        });
-        if (envio.imagenBlob) {
-  const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
-  const storageRef = ref(storage, nombreArchivo);
-  const snapshot = await uploadBytes(storageRef, envio.imagenBlob);
-  const fotoUrl = await getDownloadURL(snapshot.ref);
-  // guardar fotoUrl en el envío
+  if (envio.imagenBlob) {
+    const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
+    const storageRef = ref(storage, nombreArchivo);
+    const snapshot = await uploadBytes(storageRef, envio.imagenBlob);
+    fotoUrl = await getDownloadURL(snapshot.ref);
+  }
+
+  const docRef = await addDoc(collection(db, "envios"), {
+    ...envio,
+    senderId: remitenteId,
+    senderName: senderName || "",
+    precio,
+    demorado: false,
+    activo: true,
+    creado: Timestamp.now(),
+    estado: "Pendiente",
+    motoId: null,
+    motoName: "",
+    numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
+    fotoUrl, // ✅ guardás la URL de la imagen
+  });
+
+  await addDoc(collection(docRef, "historial"), {
+    estado: "Pendiente",
+    fecha: Timestamp.now(),
+  });
 }
-      }
       alert("Envíos creados correctamente");
       navigate("/admin")
     } catch (err) {
