@@ -28,7 +28,7 @@ const firebaseConfig = {
 
 
 const app = initializeApp(firebaseConfig);
-const storage = getStorage(app);
+export const storage = getStorage(app);
 
 export const db = getFirestore(app);
 export const auth = getAuth(app);
@@ -72,4 +72,4 @@ export async function crearEnvio({ clienteId, clienteNombre, direccion }) {
     return await deleteDoc(docRef);
   }
 
-  export {storage}
+  

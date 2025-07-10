@@ -86,6 +86,7 @@ useEffect(() => {
       alert("Envíos creados correctamente");
       navigate("/admin")
     } catch (err) {
+        console.log(err)
       console.error("Error al guardar:", err);
       alert("Error al guardar los envíos.");
     }
