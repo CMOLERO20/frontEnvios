@@ -55,13 +55,18 @@ useEffect(() => {
      for (const envio of enviosOCR) {
   const precio = obtenerPrecioPorZona(envio.zona);
   let fotoUrl = "";
-
-  if (envio.imagenBlob) {
+      try {
+        if (envio.imagenBlob) {
     const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
     const storageRef = ref(storage, nombreArchivo);
     const snapshot = await uploadBytes(storageRef, envio.imagenBlob);
     fotoUrl = await getDownloadURL(snapshot.ref);
   }
+      } catch (error) {
+            console.log(error)
+            alert("Error al guardar los foto.", error);
+      }
+  
 
   const docRef = await addDoc(collection(db, "envios"), {
     ...envio,
@@ -88,7 +93,7 @@ useEffect(() => {
     } catch (err) {
         console.log(err)
       console.error("Error al guardar:", err);
-      alert("Error al guardar los envíos.");
+      alert("Error al guardar los envíos."  , err);
     }
   };
 const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 0);
