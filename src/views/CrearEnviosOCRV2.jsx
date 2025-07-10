@@ -7,6 +7,8 @@ import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 import { getClients } from "../utils/getClients";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
 
 export default function CrearEnviosOCR() {
   const [enviosOCR, setEnviosOCR] = useState([]);
@@ -70,6 +72,13 @@ useEffect(() => {
           estado: "Pendiente",
           fecha: Timestamp.now(),
         });
+        if (envio.imagenBlob) {
+  const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
+  const storageRef = ref(storage, nombreArchivo);
+  const snapshot = await uploadBytes(storageRef, envio.imagenBlob);
+  const fotoUrl = await getDownloadURL(snapshot.ref);
+  // guardar fotoUrl en el envío
+}
       }
       alert("Envíos creados correctamente");
       navigate("/admin")

@@ -37,6 +37,7 @@ export default function OCRMultipleEnvios({ setEnvios }) {
               zona,
               precio,
               flex: true,
+               imagenBlob: blob,
             },
             error: false,
           };
