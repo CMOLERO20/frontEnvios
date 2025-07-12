@@ -3,7 +3,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import { db, storage } from "../firebase";
 import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
-import { registrarPago } from "./registrarPago";
+import { registrarPago } from "../utils/registrarPago";
 
 export async function crearEnvios({ enviosOCR, remitenteId, senderName, metodoPago }) {
 const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 0);
@@ -38,7 +38,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
       numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
       fotoUrl,
     });
-
+console.log("Envío guardado con ID:", docRef.id);
     idsEnvios.push(docRef.id);
 
     await addDoc(collection(docRef, "historial"), {
