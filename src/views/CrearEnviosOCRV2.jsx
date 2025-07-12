@@ -67,9 +67,11 @@ useEffect(() => {
             alert("Error al guardar los foto.", error);
       }
   
-        console.log( "🚀 ~ crearEnvios ~ fotoUrl :", fotoUrl )
+   const envioData = { ...envio };
+         console.log("🚀 ~ crearEnvios ~ envioData:", envioData)
+      delete envioData.imagenBlob;
   const docRef = await addDoc(collection(db, "envios"), {
-    ...envio,
+    envioData,
     senderId: remitenteId,
     senderName: senderName || "",
     precio,
