@@ -10,7 +10,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase"; // asegurate de tener tu storage ini
 import { registrarPago } from "../utils/registrarPago";
 import SelectorMetodoPago from "../components/SelectorMetodoPago";
-import { crearEnvio } from "../utils";
+import { crearEnvios } from "../utils/crearEnvio";
 
 
 export default function CrearEnviosOCR() {
@@ -56,7 +56,7 @@ const crearEnvios = async () => {
   }
 
   try {
-   await crearEnvio({ enviosOCR, remitenteId, senderName, metodoPago });
+   await crearEnvios({ enviosOCR, remitenteId, senderName, metodoPago });
     // await registrarPago({
 
     alert("Envíos creados correctamente");
