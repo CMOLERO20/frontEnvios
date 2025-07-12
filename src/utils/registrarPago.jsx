@@ -31,6 +31,7 @@ export async function registrarPago({
     // 2. Asociar el pago a los envíos
     await Promise.all(
       envios.map(async (envioId) => {
+        console.log("🚀 ~ envios.map ~ envioId:", envioId)
         const envioRef = doc(db, "envios", envioId);
         await updateDoc(envioRef, {
           pagoId: docRef.id,
