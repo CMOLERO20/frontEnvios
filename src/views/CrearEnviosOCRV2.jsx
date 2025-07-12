@@ -5,6 +5,7 @@ import { getClients } from "../utils/getClients";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { crearEnvios } from "../utils/crearEnvio";
+import SelectorMetodoPago from "../components/SelectorMetodoPago";
 
 export default function CrearEnviosOCR() {
   const [enviosOCR, setEnviosOCR] = useState([]);
