@@ -66,9 +66,13 @@ const crearEnvios = async () => {
       }
 
       const precio = obtenerPrecioPorZona(envio.zona);
+      const envioData = { ...envio };
+         console.log("🚀 ~ crearEnvios ~ envioData:", envioData)
+      delete envioData.archivoOriginal;
+   
 
       const docRef = await addDoc(collection(db, "envios"), {
-        ...envio,
+        envioData,
         senderId: remitenteId,
         senderName: senderName || "",
         precio,
@@ -90,8 +94,8 @@ const crearEnvios = async () => {
 
     alert("Envíos creados correctamente");
     navigate("/admin");
-  } catch (err) {
-    console.error("Error al guardar:", err);
+  } catch (error) {
+    console.error("Error al guardar:", error);
     alert("Error al guardar los envíos.");
   }
 };
