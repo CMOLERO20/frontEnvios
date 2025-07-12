@@ -1,20 +1,17 @@
 import React, { useState , useEffect} from "react";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { db } from "../firebase";
-import { v4 as uuidv4 } from "uuid";
 import OCRMultipleEnviosV2 from "../components/OCRMultipleEnviosV2";
 import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 import { getClients } from "../utils/getClients";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase";
+import { crearEnvios } from "../utils/crearEnvio";
 
 export default function CrearEnviosOCR() {
   const [enviosOCR, setEnviosOCR] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [remitenteId, setRemitenteId] = useState("");
-  const [senderName, setSenderName] = useState('')
+  const [senderName, setSenderName] = useState('');
+    const [metodoPago, setMetodoPago] = useState(null);
 
   const navigate = useNavigate();
 useEffect(() => {
@@ -37,67 +34,30 @@ useEffect(() => {
         setSenderName(usuario?.nombre || "");
   };
 
-
   const actualizarZona = (index, nuevaZona) => {
     const actualizados = [...enviosOCR];
     actualizados[index].zona = nuevaZona;
     setEnviosOCR(actualizados);
   };
 
-  const crearEnvios = async () => {
-    const sinZona = enviosOCR.some((envio) => !envio.zona);
-    if (sinZona) {
-      alert("Todos los envíos deben tener una zona asignada.");
-      return;
-    }
-
-    try {
-     for (const envio of enviosOCR) {
-  const precio = obtenerPrecioPorZona(envio.zona);
-  let fotoUrl = "";
-      try {
-        if (envio.imagenBlob) {
-    const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
-    const storageRef = ref(storage, nombreArchivo);
-    const snapshot = await uploadBytes(storageRef, envio.imagenBlob);
-    fotoUrl = await getDownloadURL(snapshot.ref);
-  }
-      } catch (error) {
-            console.log(error)
-            alert("Error al guardar los foto.", error);
-      }
-  
-   const envioData = { ...envio };
-         console.log("🚀 ~ crearEnvios ~ envioData:", envioData)
-      delete envioData.imagenBlob;
-  const docRef = await addDoc(collection(db, "envios"), {
-    ...envioData,
-    senderId: remitenteId,
-    senderName: senderName || "",
-    precio,
-    demorado: false,
-    activo: true,
-    creado: Timestamp.now(),
-    estado: "Pendiente",
-    motoId: null,
-    motoName: "",
-    numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
-    fotoUrl, //  guardás la URL de la imagen
-  });
-  console.log("Envío guardado con ID:", docRef.id);
-  await addDoc(collection(docRef, "historial"), {
-    estado: "Pendiente",
-    fecha: Timestamp.now(),
-  });
-}
-      alert("Envíos creados correctamente");
-      navigate("/admin")
-    } catch (err) {
-        console.log(err)
-      console.error("Error al guardar:", err);
-      alert("Error al guardar los envíos."  , err);
-    }
-  };
+ const guardarEnvios = async () => {
+   const sinZona = enviosOCR.some((envio) => !envio.zona);
+   if (sinZona) {
+     alert("Todos los envíos deben tener una zona asignada.");
+     return;
+   }
+ 
+   try {
+    await crearEnvios({ enviosOCR, remitenteId, senderName, metodoPago });
+    
+ 
+     alert("Envíos creados correctamente");
+     navigate("/admin");
+   } catch (error) {
+     console.error("Error al guardar:", error);
+     alert("Error al guardar los envíos.");
+   }
+ };
 const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 0);
 
   return (
@@ -132,6 +92,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
         </option>
       ))}
     </select></div>
+
       <div className="mt-6 p-4 bg-gray-100 rounded-md flex justify-between items-center text-sm sm:text-base text-gray-800 shadow-sm">
   
     
@@ -141,6 +102,9 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
   <div>
     <p><span className="font-medium">💰 Total estimado:</span> ${totalPrecio.toLocaleString("es-AR")}</p>
   </div>
+
+   
+     <SelectorMetodoPago onMetodoSeleccionado={(metodo) => setMetodoPago(metodo)} />
 </div>
       <h2 className="text-xl font-semibold text-gray-800">Asignar zona por envío</h2>
 
@@ -186,7 +150,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
 
       <div className="flex justify-end gap-3">
         <button
-          onClick={crearEnvios}
+          onClick={guardarEnvios}
           className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md transition"
         >
           Confirmar y guardar {enviosOCR.length} envío{enviosOCR.length > 1 && "s"}
