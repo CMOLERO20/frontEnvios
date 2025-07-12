@@ -72,7 +72,7 @@ const crearEnvios = async () => {
    
 
       const docRef = await addDoc(collection(db, "envios"), {
-        envioData,
+        ...envioData,
         senderId: remitenteId,
         senderName: senderName || "",
         precio,

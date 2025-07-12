@@ -71,7 +71,7 @@ useEffect(() => {
          console.log("🚀 ~ crearEnvios ~ envioData:", envioData)
       delete envioData.imagenBlob;
   const docRef = await addDoc(collection(db, "envios"), {
-    envioData,
+    ...envioData,
     senderId: remitenteId,
     senderName: senderName || "",
     precio,
