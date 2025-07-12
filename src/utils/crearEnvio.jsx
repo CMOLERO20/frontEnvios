@@ -12,7 +12,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
 
   for (const envio of enviosOCR) {
     let fotoUrl = "";
-    const archivo = envio.imagenOriginal || envio.imagenBlob || null;
+    const archivo = envio.archivoOriginal || envio.imagenBlob || null;
     // Subir imagen si existe
     if (archivo) {
       const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
@@ -24,6 +24,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
     const precio = obtenerPrecioPorZona(envio.zona);
     const envioData = { ...envio };
     delete envioData.archivoOriginal;
+    delete envioData.imagenBlob;
 
     const docRef = await addDoc(collection(db, "envios"), {
       ...envioData,
