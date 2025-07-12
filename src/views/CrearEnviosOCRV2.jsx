@@ -67,7 +67,7 @@ useEffect(() => {
             alert("Error al guardar los foto.", error);
       }
   
-
+        console.log( "🚀 ~ crearEnvios ~ fotoUrl :", fotoUrl )
   const docRef = await addDoc(collection(db, "envios"), {
     ...envio,
     senderId: remitenteId,
@@ -80,9 +80,9 @@ useEffect(() => {
     motoId: null,
     motoName: "",
     numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
-    fotoUrl, // ✅ guardás la URL de la imagen
+    fotoUrl, //  guardás la URL de la imagen
   });
-
+  console.log("Envío guardado con ID:", docRef.id);
   await addDoc(collection(docRef, "historial"), {
     estado: "Pendiente",
     fecha: Timestamp.now(),

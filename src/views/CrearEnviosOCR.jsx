@@ -6,6 +6,8 @@ import OCRMultipleEnvios from "../components/OCRMultipleEnvios";
 import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 import { getClients } from "../utils/getClients";
 import { useNavigate } from "react-router-dom";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase"; // asegurate de tener tu storage ini
 
 
 export default function CrearEnviosOCR() {
@@ -42,42 +44,57 @@ useEffect(() => {
     setEnviosOCR(actualizados);
   };
 
-  const crearEnvios = async () => {
-    const sinZona = enviosOCR.some((envio) => !envio.zona);
-    if (sinZona) {
-      alert("Todos los envíos deben tener una zona asignada.");
-      return;
-    }
+const crearEnvios = async () => {
+  const sinZona = enviosOCR.some((envio) => !envio.zona);
+  if (sinZona) {
+    alert("Todos los envíos deben tener una zona asignada.");
+    return;
+  }
 
-    try {
-      for (const envio of enviosOCR) {
-        const precio = obtenerPrecioPorZona(envio.zona);
-        const docRef = await addDoc(collection(db, "envios"), {
-          ...envio,
-          senderId: remitenteId,
-          senderName: senderName || "",
-          precio,
-          demorado: false,
-          activo: true,
-          creado: Timestamp.now(),
-          estado: "Pendiente",
-          motoId: null,
-          motoName: "",
-          numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
-        });
+  try {
+    for (const envio of enviosOCR) {
+      console.log("🚀 ~ crearEnvios ~ envio:", envio)
+      let fotoUrl = "";
 
-        await addDoc(collection(docRef, "historial"), {
-          estado: "Pendiente",
-          fecha: Timestamp.now(),
-        });
+      // 📸 Si tiene archivo original, lo subimos a Storage
+      if (envio.archivoOriginal) {
+        const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
+        const storageRef = ref(storage, nombreArchivo);
+        const snapshot = await uploadBytes(storageRef, envio.archivoOriginal);
+        fotoUrl = await getDownloadURL(snapshot.ref);
+        console.log("🚀 ~ crearEnvios ~ fotoUrl :", fotoUrl )
       }
-      alert("Envíos creados correctamente");
-      navigate("/admin")
-    } catch (err) {
-      console.error("Error al guardar:", err);
-      alert("Error al guardar los envíos.");
+
+      const precio = obtenerPrecioPorZona(envio.zona);
+
+      const docRef = await addDoc(collection(db, "envios"), {
+        ...envio,
+        senderId: remitenteId,
+        senderName: senderName || "",
+        precio,
+        demorado: false,
+        activo: true,
+        creado: Timestamp.now(),
+        estado: "Pendiente",
+        motoId: null,
+        motoName: "",
+        numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
+        fotoUrl,
+      });
+
+      await addDoc(collection(docRef, "historial"), {
+        estado: "Pendiente",
+        fecha: Timestamp.now(),
+      });
     }
-  };
+
+    alert("Envíos creados correctamente");
+    navigate("/admin");
+  } catch (err) {
+    console.error("Error al guardar:", err);
+    alert("Error al guardar los envíos.");
+  }
+};
 const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 0);
 
   return (

@@ -5,6 +5,8 @@ import { CameraIcon } from "@heroicons/react/24/solid";
 import asignarZonaPorLocalidad from "../utils/asignarZonaPorLocalidad";
 import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 const ocrUrl = import.meta.env.VITE_OCR_URL
+
+
 export default function OCRMultipleEnvios({ setEnvios }) {
   const [cargando, setCargando] = useState(false);
 
@@ -13,46 +15,49 @@ export default function OCRMultipleEnvios({ setEnvios }) {
     setCargando(true);
 
     const procesados = await Promise.all(
-      files.map(async (file) => {
-        const formData = new FormData();
-        formData.append("archivo", file);
+  files.map(async (file) => {
+    const formData = new FormData();
+    formData.append("archivo", file);
 
-        try {
-          const res = await fetch(ocrUrl, {
-            method: "POST",
-            body: formData,
-          });
-          const json = await res.json();
+    try {
+      const res = await fetch(ocrUrl, {
+        method: "POST",
+        body: formData,
+      });
+      const json = await res.json();
 
-          const localidad = json.datos?.localidad || "";
-          const zona = asignarZonaPorLocalidad(localidad);
-          const precio = obtenerPrecioPorZona(zona)
+      const localidad = json.datos?.localidad || "";
+      const zona = asignarZonaPorLocalidad(localidad);
+      const precio = obtenerPrecioPorZona(zona);
 
-          return {
-            nombre: file.name,
-            datos: {
-              ...json.datos,
-              zona,
-              precio,
-              nombreArchivo: file.name,
-              flex: true,
-            },
-            error: false,
-          };
-        } catch (err) {
-          return {
-            nombre: file.name,
-            error: true,
-            mensaje: "Error procesando archivo",
-          };
-        }
-      })
-    );
+      return {
+        nombre: file.name,
+        datos: {
+          ...json.datos,
+          zona,
+          precio,
+          nombreArchivo: file.name,
+          flex: true,
+          archivoOriginal: file, // 🔁 esto lo pasás al padre
+        },
+        error: false,
+      };
+    } catch (err) {
+      return {
+        nombre: file.name,
+        error: true,
+        mensaje: "Error procesando archivo",
+      };
+    }
+  })
+);
 
+const enviosLimpios = procesados
+  .filter((r) => !r.error)
+  .map((r) => r.datos);
 
-    const enviosLimpios = procesados.filter((r) => !r.error).map((r) => r.datos);
-    setEnvios(enviosLimpios);
-    setCargando(false);
+setEnvios(enviosLimpios); // 📤 Esto lo subís al padre
+setCargando(false);
   };
 
   return (
