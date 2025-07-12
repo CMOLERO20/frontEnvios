@@ -8,13 +8,17 @@ import { getClients } from "../utils/getClients";
 import { useNavigate } from "react-router-dom";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase"; // asegurate de tener tu storage ini
+import { registrarPago } from "../utils/registrarPago";
+import SelectorMetodoPago from "../components/SelectorMetodoPago";
+import { crearEnvio } from "../utils";
 
 
 export default function CrearEnviosOCR() {
   const [enviosOCR, setEnviosOCR] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [remitenteId, setRemitenteId] = useState("");
-  const [senderName, setSenderName] = useState('')
+  const [senderName, setSenderName] = useState('');
+  const [metodoPago, setMetodoPago] = useState(null);
 
   const navigate = useNavigate();
 useEffect(() => {
@@ -52,45 +56,8 @@ const crearEnvios = async () => {
   }
 
   try {
-    for (const envio of enviosOCR) {
-      console.log("🚀 ~ crearEnvios ~ envio:", envio)
-      let fotoUrl = "";
-
-      // 📸 Si tiene archivo original, lo subimos a Storage
-      if (envio.archivoOriginal) {
-        const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
-        const storageRef = ref(storage, nombreArchivo);
-        const snapshot = await uploadBytes(storageRef, envio.archivoOriginal);
-        fotoUrl = await getDownloadURL(snapshot.ref);
-        console.log("🚀 ~ crearEnvios ~ fotoUrl :", fotoUrl )
-      }
-
-      const precio = obtenerPrecioPorZona(envio.zona);
-      const envioData = { ...envio };
-         console.log("🚀 ~ crearEnvios ~ envioData:", envioData)
-      delete envioData.archivoOriginal;
-   
-
-      const docRef = await addDoc(collection(db, "envios"), {
-        ...envioData,
-        senderId: remitenteId,
-        senderName: senderName || "",
-        precio,
-        demorado: false,
-        activo: true,
-        creado: Timestamp.now(),
-        estado: "Pendiente",
-        motoId: null,
-        motoName: "",
-        numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
-        fotoUrl,
-      });
-
-      await addDoc(collection(docRef, "historial"), {
-        estado: "Pendiente",
-        fecha: Timestamp.now(),
-      });
-    }
+   await crearEnvio({ enviosOCR, remitenteId, senderName, metodoPago });
+    // await registrarPago({
 
     alert("Envíos creados correctamente");
     navigate("/admin");
@@ -105,6 +72,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
     <div className="max-w-4xl mx-auto p-6 space-y-6">
   <div className="bg-white shadow-md rounded-lg p-6">
     <h2 className="text-2xl font-bold mb-4 text-gray-800">Cargar múltiples etiquetas</h2>
+     <OCRMultipleEnvios setEnvios={setEnviosOCR} />
 
     <label className="block text-sm font-medium text-gray-700 mb-1">Seleccionar remitente:</label>
     <select
@@ -119,8 +87,8 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
         </option>
       ))}
     </select>
-
-    <OCRMultipleEnvios setEnvios={setEnviosOCR} />
+      
+   <SelectorMetodoPago onMetodoSeleccionado={(metodo) => setMetodoPago(metodo)} />
   </div>
 
   {enviosOCR.length > 0 && (
