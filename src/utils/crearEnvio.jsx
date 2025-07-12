@@ -6,6 +6,7 @@ import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 import { registrarPago } from "../utils/registrarPago";
 
 export async function crearEnvios({ enviosOCR, remitenteId, senderName, metodoPago }) {
+console.log("🚀 ~ crearEnvios ~ enviosOCR, remitenteId, senderName, metodoPago:", enviosOCR, remitenteId, senderName, metodoPago)
 const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 0);
   const idsEnvios = [];
 
