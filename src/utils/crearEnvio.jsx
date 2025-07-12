@@ -12,12 +12,12 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
 
   for (const envio of enviosOCR) {
     let fotoUrl = "";
-
+    const archivo = envio.imagenOriginal || envio.imagenBlob || null;
     // Subir imagen si existe
-    if (envio.archivoOriginal) {
+    if (archivo) {
       const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
       const storageRef = ref(storage, nombreArchivo);
-      const snapshot = await uploadBytes(storageRef, envio.archivoOriginal);
+      const snapshot = await uploadBytes(storageRef, archivo);
       fotoUrl = await getDownloadURL(snapshot.ref);
     }
 
