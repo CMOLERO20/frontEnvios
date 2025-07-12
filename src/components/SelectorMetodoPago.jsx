@@ -1,16 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SelectorMetodoPago({ onMetodoSeleccionado }) {
   const [metodo, setMetodo] = useState("efectivo");
 
-  const handleSeleccionar = () => {
-    if (!metodo) {
-      alert("Debés seleccionar un método de pago.");
-      return;
-    }
-
+  useEffect(() => {
     onMetodoSeleccionado(metodo);
-  };
+  }, [metodo]);
 
   return (
     <div className="bg-white border border-gray-200 rounded-md p-4 space-y-4 shadow-sm">
@@ -25,7 +20,6 @@ export default function SelectorMetodoPago({ onMetodoSeleccionado }) {
         <option value="transferencia">Transferencia</option>
         <option value="cuenta_corriente">Cuenta corriente</option>
       </select>
-
     </div>
   );
 }
