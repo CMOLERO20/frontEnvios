@@ -48,7 +48,7 @@ useEffect(() => {
     setEnviosOCR(actualizados);
   };
 
-const crearEnvios = async () => {
+const guardarEnvios = async () => {
   const sinZona = enviosOCR.some((envio) => !envio.zona);
   if (sinZona) {
     alert("Todos los envíos deben tener una zona asignada.");
@@ -145,7 +145,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
 
       <div className="flex justify-end gap-3">
         <button
-          onClick={crearEnvios}
+          onClick={guardarEnvios}
           className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md transition"
         >
           Confirmar y guardar {enviosOCR.length} envío{enviosOCR.length > 1 && "s"}
