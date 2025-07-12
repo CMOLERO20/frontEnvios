@@ -1,14 +1,8 @@
 import React, { useState , useEffect} from "react";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { db } from "../firebase";
-import { v4 as uuidv4 } from "uuid";
 import OCRMultipleEnvios from "../components/OCRMultipleEnvios";
 import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 import { getClients } from "../utils/getClients";
 import { useNavigate } from "react-router-dom";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase"; // asegurate de tener tu storage ini
-import { registrarPago } from "../utils/registrarPago";
 import SelectorMetodoPago from "../components/SelectorMetodoPago";
 import { crearEnvios } from "../utils/crearEnvio";
 
@@ -57,7 +51,7 @@ const guardarEnvios = async () => {
 
   try {
    await crearEnvios({ enviosOCR, remitenteId, senderName, metodoPago });
-    // await registrarPago({
+   
 
     alert("Envíos creados correctamente");
     navigate("/admin");
