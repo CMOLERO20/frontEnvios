@@ -13,18 +13,20 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
   for (const envio of enviosOCR) {
     let fotoUrl = "";
     const archivo = envio.archivoOriginal || envio.imagenBlob || null;
+    const envioData = { ...envio };
     // Subir imagen si existe
     if (archivo) {
       const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
       const storageRef = ref(storage, nombreArchivo);
       const snapshot = await uploadBytes(storageRef, archivo);
       fotoUrl = await getDownloadURL(snapshot.ref);
+       delete envioData.archivoOriginal;
+    delete envioData.imagenBlob;
     }
 
     const precio = obtenerPrecioPorZona(envio.zona);
-    const envioData = { ...envio };
-    delete envioData.archivoOriginal;
-    delete envioData.imagenBlob;
+    
+   
 
     const docRef = await addDoc(collection(db, "envios"), {
       ...envioData,
@@ -38,7 +40,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
       motoId: null,
       motoName: "",
       numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
-      fotoUrl,
+      fotoUrl: fotoUrl || "",
     });
 console.log("Envío guardado con ID:", docRef.id);
     idsEnvios.push(docRef.id);

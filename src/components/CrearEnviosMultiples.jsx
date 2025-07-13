@@ -1,26 +1,20 @@
 import React, { useEffect, useState } from "react";
-import {
-collection,
-addDoc,
-Timestamp,
-
-} from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase";
-import { v4 as uuidv4 } from "uuid";
 import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 import localidades from "../utils/localidades";
 import { getClients } from "../utils/getClients";
 import Spinner from "./Spinner";
-
+import SelectorMetodoPago from "../components/SelectorMetodoPago";
+import { crearEnvios } from "../utils/crearEnvio";
 
 export default function CrearEnviosMultiples() {
 const [usuarios, setUsuarios] = useState([]);
 const [guardando, setGuardando] = useState(false);
 const [mensaje, setMensaje] = useState(null);
-const [remitente, setRemitente] = useState([]);
+const [remitenteId, setRemitenteId] = useState('');
 const [senderName, setSenderName] = useState('')
 const [envios, setEnvios] = useState([]);
+  const [metodoPago, setMetodoPago] = useState(null);
 const [form, setForm] = useState({
 recieverName: "",
 recieverDni: "",
@@ -55,19 +49,18 @@ zona: name === "localidad" ? localidades[value] || "" : prev.zona,
 
 const agregarEnvio = () => {
 if (!form.recieverName || !form.recieverAddress || !form.localidad || !form.zona) {
+
 return alert("Faltan campos obligatorios del destinatario o destino.");
 }
-const precio = obtenerPrecioPorZona(form.zona);
+
 
 const nuevoEnvio = {
   ...form,
-  senderId: remitente,
-  senderName: senderName,
-   precio: precio,
-   activo:true
+  precio: obtenerPrecioPorZona(form.zona),
 };
 
 setEnvios((prev) => [...prev, nuevoEnvio]);
+console.log("Nuevo envío agregado:", envios);
 setForm({
   recieverName: "",
   recieverDni: "",
@@ -79,29 +72,18 @@ setForm({
 });
 };
 
-const crearEnvios = async () => {
-  if (!remitente || envios.length === 0) {
+const guardarEnvios = async () => {
+  if (!remitenteId || envios.length === 0) {
     setMensaje({ tipo: "error", texto: "Seleccioná un remitente y agregá al menos un envío." });
     return;
   }
 
   try {
     setGuardando(true);
-    for (const envio of envios) {
-      const docRef = await addDoc(collection(db, "envios"), {
-        ...envio,
-        creado: Timestamp.now(),
-        estado: "Pendiente",
-        motoId: null,
-        motoName: "",
-        demorado: false,
-        numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
-      });
-      await addDoc(collection(docRef, "historial"), {
-        estado: "Pendiente",
-        fecha: Timestamp.now(),
-      });
-    }
+    
+    await crearEnvios({ enviosOCR: [...envios], remitenteId, senderName, metodoPago });
+
+  
     setMensaje({ tipo: "ok", texto: "Envíos creados correctamente ✅" });
     setTimeout(() => navigate("/admin"), 2000);
   } catch (error) {
@@ -121,11 +103,11 @@ return (
     <label className="block font-medium text-gray-700 mb-1">Remitente</label>
     <select
       className="border border-gray-300 rounded p-2 w-full"
-      value={remitente}
+      value={remitenteId}
       onChange={(e) => {
         const id = e.target.value;
         const usuario = usuarios.find((u) => u.uid === id);
-        setRemitente(id);
+        setRemitenteId(id);
         setSenderName(usuario?.nombre || "");
       }}
     >
@@ -267,6 +249,7 @@ return (
         Envíos cargados ({envios.length}) – Total: $
         {envios.reduce((sum, e) => sum + (e.precio || obtenerPrecioPorZona(e.zona)), 0).toLocaleString("es-AR")}
       </h3>
+      <SelectorMetodoPago onMetodoSeleccionado={(metodo) => setMetodoPago(metodo)} />
       <div className="grid gap-4">
         {envios.map((e, i) => (
           <div key={i} className="justify-between border border-gray-200 rounded p-3 shadow-sm bg-gray-50 text-sm flex ">
@@ -303,7 +286,7 @@ return (
   <div className="flex gap-4">
     <button
       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
-      onClick={crearEnvios}
+      onClick={guardarEnvios}
     >
       Crear Envíos
     </button>

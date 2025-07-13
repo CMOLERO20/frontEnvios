@@ -37,6 +37,13 @@ export async function registrarPago({
           pagoId: docRef.id,
           estadoPago: pago.estado, // opcional: puede ser "pendiente" o "confirmado"
         });
+
+            if (metodo === "cuenta_corriente") {
+      const clienteRef = doc(db, "clientes", clienteId);
+      await updateDoc(clienteRef, {
+        cuentaCorriente: increment(monto),
+      });
+    }
       })
     );
 

@@ -50,6 +50,7 @@ try {
     nombre: form.nombre,
     telefono: form.telefono,
     role: rol,
+    cuentaCorriente: 0, // Inicializar cuenta corriente en 0
   });
   navigate("/admin");
 } catch (err) {
