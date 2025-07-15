@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.1.8",
+    "browser-image-compression": "^2.0.2",
     "dotenv": "^16.5.0",
     "firebase": "^11.8.1",
     "react": "^19.1.0",

@@ -5,6 +5,7 @@ import { db, storage } from "../firebase";
 import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 import { registrarPago } from "../utils/registrarPago";
 import { registrarPasivoCuentaCorriente } from "../utils/registrarPasivoCuentaCorriente";
+import { comprimirImagen } from "../utils/comprimirImagen";
 
 export async function crearEnvios({ enviosOCR, remitenteId, senderName, metodoPago }) {
 console.log("🚀 ~ crearEnvios ~ enviosOCR, remitenteId, senderName, metodoPago:", enviosOCR, remitenteId, senderName, metodoPago)
@@ -17,9 +18,10 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
     const envioData = { ...envio };
     // Subir imagen si existe
     if (archivo) {
+      const archivoComprimido = await comprimirImagen(archivo);
       const nombreArchivo = `etiquetas/${uuidv4()}.jpg`;
       const storageRef = ref(storage, nombreArchivo);
-      const snapshot = await uploadBytes(storageRef, archivo);
+      const snapshot = await uploadBytes(storageRef, archivoComprimido);
       fotoUrl = await getDownloadURL(snapshot.ref);
        delete envioData.archivoOriginal;
     delete envioData.imagenBlob;
