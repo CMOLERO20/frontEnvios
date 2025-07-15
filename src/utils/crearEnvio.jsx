@@ -58,24 +58,26 @@ console.log("Envío guardado con ID:", docRef.id);
     if (metodoPago === "cuenta_corriente" && totalPrecio > 0) {
       await registrarPasivoCuentaCorriente({
        clienteId: remitenteId,
-  clienteNombre: senderName,
-  metodo: metodoPago,
-  monto: totalPrecio,
-  creadoPor: "cliente",
-  envios: idsEnvios }) } else if (metodoPago !== "cuenta_corriente" && totalPrecio > 0) {
-
+      clienteNombre: senderName,
+      metodo: metodoPago,
+      monto: totalPrecio,
+      creadoPor: "admin",
+      envios: idsEnvios }) } else {
+      if (totalPrecio > 0) {
         await registrarPago({
        clienteId: remitenteId,
-  clienteNombre: senderName,
-  metodo: metodoPago,
-  monto: totalPrecio,
-  creadoPor: "cliente",
-  envios: idsEnvios })}
-   } catch (error) {
-    console.error("Error al registrar el pago:", error);
-    throw new Error("Error al registrar el pago.");
+      clienteNombre: senderName,
+      metodo: metodoPago,
+      monto: totalPrecio,
+      creadoPor: "admin",
+      envios: idsEnvios })}
+        }
+      } catch (error) {
+        console.error("Error al registrar el pago:", error);
+        throw new Error("Error al registrar el pago.");
+        
+      }
     
-   }
     
  
 

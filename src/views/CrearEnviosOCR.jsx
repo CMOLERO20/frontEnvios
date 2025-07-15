@@ -13,6 +13,7 @@ export default function CrearEnviosOCR() {
   const [remitenteId, setRemitenteId] = useState("");
   const [senderName, setSenderName] = useState('');
   const [metodoPago, setMetodoPago] = useState(null);
+  console.log("🚀 ~ CrearEnviosOCR ~ metodoPago:", metodoPago)
 
   const navigate = useNavigate();
 useEffect(() => {

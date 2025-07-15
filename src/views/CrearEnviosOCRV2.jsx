@@ -50,7 +50,6 @@ useEffect(() => {
  
    try {
     await crearEnvios({ enviosOCR, remitenteId, senderName, metodoPago });
-    
  
      alert("Envíos creados correctamente");
      navigate("/admin");
@@ -105,7 +104,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
   </div>
 
    
-     <SelectorMetodoPago onMetodoSeleccionado={(metodo) => setMetodoPago(metodo)} />
+     <SelectorMetodoPago onMetodoSeleccionado={(m) => setMetodoPago(m)} />
 </div>
       <h2 className="text-xl font-semibold text-gray-800">Asignar zona por envío</h2>
 
