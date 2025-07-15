@@ -16,7 +16,7 @@ export default function SelectorMetodoPago({ onMetodoSeleccionado }) {
         value={''}
         onChange={(e) => setMetodo(e.target.value)}
        
-      >
+      > <option value="">Elegir metodo de pago...</option>
         <option value="efectivo">Efectivo</option>
         <option value="transferencia">Transferencia</option>
         <option value="cuenta_corriente">Cuenta corriente</option>
