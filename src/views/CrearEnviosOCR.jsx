@@ -12,7 +12,7 @@ export default function CrearEnviosOCR() {
   const [clientes, setClientes] = useState([]);
   const [remitenteId, setRemitenteId] = useState("");
   const [senderName, setSenderName] = useState('');
-  const [metodoPago, setMetodoPago] = useState(null);
+  const [metodoPago, setMetodoPago] = useState('efectivo');
   console.log("🚀 ~ CrearEnviosOCR ~ metodoPago:", metodoPago)
 
   const navigate = useNavigate();
