@@ -15,7 +15,7 @@ import TablaEnvios from "../components/TablaEnvios";
 import ContadorEnvios from "../components/ContadorEnvios";
 import { RegistrarCliente } from "../components/RegistrarUsuario";
 import { useNavigate } from "react-router-dom";
-
+import TarjetaMenu from "../components/TarjetaMenu";
 
 const columnas = [
   
@@ -59,7 +59,43 @@ const etiquetas = {
   recieverAddress: "Dirección de Entrega",
 };
 
-
+const categorias = [
+  {
+    nombre: "Ver Envíos",
+    ruta: '/admin/envios',
+  },
+  {
+    nombre: "Crear Envíos",
+    subrutas: [
+      { label: "Manual", ruta: "/admin/crear-multiples" },
+      { label: "Foto", ruta: "/admin/crear-envios-ocr" },
+      { label: "Cámara", ruta: "/admin/crear-envios-ocr-v2" },
+    ],
+  },
+  {
+    nombre: "Clientes",
+    subrutas: [
+      { label: "Crear Cliente", ruta: "/crear-cliente" },
+      { label: "Ver Clientes", ruta: "/admin/clientes" },
+    ],
+  },
+  
+  {
+    nombre: "Pagos",
+    subrutas: [
+      { label: "Registrar Pago", ruta: "/admin/pagos/registro" },
+      { label: "Ver Pagos", ruta: "/admin/pagos/" },
+    ],
+  },
+  {
+    nombre: "Motos",
+    subrutas: [
+      { label: "Asignar Envíos", ruta: "/admin/motos/asignar" },
+      { label: "Registrar Repartidor", ruta: "/admin/motos/registrar" },
+      { label: "Envíos por Repartidor", ruta: "/admin/motos/envios" },
+    ],
+  },
+];
 export default function AdminDashboard() {
   const [envios, setEnvios] = useState([]);
   const [enviosFiltrados, setEnviosFiltrados] = useState([]);
@@ -123,34 +159,11 @@ export default function AdminDashboard() {
     />
   </div>
 
+ <TarjetaMenu categorias={categorias} />
   {/* Botones de acciones */}
     <h1 className="text-2xl font-extrabold text-gray-800 mb-6">Acciones</h1>
   <div className="flex flex-wrap gap-3 items-center mb-6">
   
-  <button
-    onClick={() => navigate("/crear-cliente")}
-    className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
-  >
-    Crear Cliente
-  </button>
-<button
-    onClick={() => navigate("/admin/crear-envios-ocr")}
-    className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
-  >
-    Lector de Etiquetas
-  </button>
-  <button
-    onClick={() => navigate("/admin/crear-envios-ocr-v2")}
-    className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
-  >
-    Lector de Etiquetas V2
-  </button>
-  <button
-    onClick={() => navigate("/admin/crear-multiples")}
-    className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition"
-  >
-    Crear múltiples envíos
-  </button>
 
   <BotonAsignarRepartidor
     enviosSeleccionados={seleccionados}

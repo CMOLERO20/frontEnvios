@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { db, storage } from "../firebase";
 import obtenerPrecioPorZona from "../utils/obtenerPrecioPorZona";
 import { registrarPago } from "../utils/registrarPago";
+import { registrarPasivoCuentaCorriente } from "../utils/registrarPasivoCuentaCorriente";
 
 export async function crearEnvios({ enviosOCR, remitenteId, senderName, metodoPago }) {
 console.log("🚀 ~ crearEnvios ~ enviosOCR, remitenteId, senderName, metodoPago:", enviosOCR, remitenteId, senderName, metodoPago)
@@ -41,6 +42,7 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
       motoName: "",
       numeroEnvio: "ENV-" + uuidv4().slice(0, 8),
       fotoUrl: fotoUrl || "",
+      rendido: false,
     });
 console.log("Envío guardado con ID:", docRef.id);
     idsEnvios.push(docRef.id);
@@ -52,13 +54,23 @@ console.log("Envío guardado con ID:", docRef.id);
   }
 
    try {
+    // Registrar el pago si es necesario
+    if (metodoPago === "cuenta_corriente" && totalPrecio > 0) {
+      await registrarPasivoCuentaCorriente({
+       clienteId: remitenteId,
+  clienteNombre: senderName,
+  metodo: metodoPago,
+  monto: totalPrecio,
+  creadoPor: "cliente",
+  envios: idsEnvios }) } else if (metodoPago !== "cuenta_corriente" && totalPrecio > 0) {
+
         await registrarPago({
        clienteId: remitenteId,
   clienteNombre: senderName,
   metodo: metodoPago,
   monto: totalPrecio,
   creadoPor: "cliente",
-  envios: idsEnvios })
+  envios: idsEnvios })}
    } catch (error) {
     console.error("Error al registrar el pago:", error);
     throw new Error("Error al registrar el pago.");
