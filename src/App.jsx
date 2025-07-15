@@ -19,6 +19,10 @@ import CrearEnviosOCR from "./views/CrearEnviosOCR";
 import CrearEnviosOCRV2 from "./views/CrearEnviosOCRV2";
 
 import dotenv from 'dotenv';
+import VistaEnvios from "./views/VistaEnvios";
+import VistaClienteById from "./views/VistaClienteById";
+import VistaClientes from "./views/VistaClientes";
+import VistaPagos from "./views/VistaPagos";
 
 
 export default function App() {
@@ -39,6 +43,11 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/admin/envios" element={<VistaEnvios />} />
+        <Route path="/admin/clientes/" element={<VistaClientes/>} />
+         <Route path="/admin/clientes/:id" element={<VistaClienteById  />} />
+         <Route path="/admin/pagos/" element={<VistaPagos  />} />
+
 <Route path="/admin/crear-multiples" element={<CrearEnviosMultiples />} />
 <Route path="/admin/crear-envios-ocr" element={<CrearEnviosOCR />} />
 <Route path="/admin/crear-envios-ocr-v2" element={<CrearEnviosOCRV2 />} />

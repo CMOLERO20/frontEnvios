@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export default function SelectorMetodoPago({ onMetodoSeleccionado }) {
-  const [metodo, setMetodo] = useState("efectivo");
+  const [metodo, setMetodo] = useState("");
 
   useEffect(() => {
     onMetodoSeleccionado(metodo);
@@ -15,6 +15,7 @@ export default function SelectorMetodoPago({ onMetodoSeleccionado }) {
         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         value={metodo}
         onChange={(e) => setMetodo(e.target.value)}
+       
       >
         <option value="efectivo">Efectivo</option>
         <option value="transferencia">Transferencia</option>

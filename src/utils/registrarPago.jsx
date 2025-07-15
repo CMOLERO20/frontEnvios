@@ -28,22 +28,19 @@ export async function registrarPago({
     // 1. Registrar el pago
     const docRef = await addDoc(collection(db, "pagos"), pago);
 
+
+
     // 2. Asociar el pago a los envíos
     await Promise.all(
       envios.map(async (envioId) => {
-        console.log("🚀 ~ envios.map ~ envioId:", envioId)
+              console.log("🚀 ~ envios.map ~ envioId:", envioId)
         const envioRef = doc(db, "envios", envioId);
         await updateDoc(envioRef, {
           pagoId: docRef.id,
           estadoPago: pago.estado, // opcional: puede ser "pendiente" o "confirmado"
         });
 
-            if (metodo === "cuenta_corriente") {
-      const clienteRef = doc(db, "clientes", clienteId);
-      await updateDoc(clienteRef, {
-        cuentaCorriente: increment(monto),
-      });
-    }
+           
       })
     );
 
