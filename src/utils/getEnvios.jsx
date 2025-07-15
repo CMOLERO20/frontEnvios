@@ -1,4 +1,4 @@
-import { collection, getDocs, where} from "firebase/firestore";
+import { query, collection, getDocs, where} from "firebase/firestore";
 import { db } from "../firebase"; // ajustá la ruta si es diferente
 
 export const getEnvios = async () => {
@@ -16,10 +16,10 @@ export const getEnvios = async () => {
 
 export const getEnviosById = async (id) => {
   try {
- const snapshot = await getDocs(collection(db, "envios"), where("senderId", "==", id));
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    
-  
+ const enviosRef = collection(db, "envios");
+const enviosQuery = query(enviosRef, where("senderId", "==", id));
+const snapshot = await getDocs(enviosQuery);
+const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     return data;
   } catch (error) {
     console.error("Error al obtener envios:", error);
