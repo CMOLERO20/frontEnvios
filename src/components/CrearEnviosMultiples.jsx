@@ -14,7 +14,7 @@ const [mensaje, setMensaje] = useState(null);
 const [remitenteId, setRemitenteId] = useState('');
 const [senderName, setSenderName] = useState('')
 const [envios, setEnvios] = useState([]);
-  const [metodoPago, setMetodoPago] = useState(null);
+  const [metodoPago, setMetodoPago] = useState('');
 const [form, setForm] = useState({
 recieverName: "",
 recieverDni: "",
