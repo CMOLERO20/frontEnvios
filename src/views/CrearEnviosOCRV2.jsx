@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { crearEnvios } from "../utils/crearEnvio";
 import SelectorMetodoPago from "../components/SelectorMetodoPago";
+import Spinner from "../components/Spinner";
 
 export default function CrearEnviosOCR() {
   const [enviosOCR, setEnviosOCR] = useState([]);
@@ -13,6 +14,7 @@ export default function CrearEnviosOCR() {
   const [remitenteId, setRemitenteId] = useState("");
   const [senderName, setSenderName] = useState('');
     const [metodoPago, setMetodoPago] = useState('');
+    const [guardando, setGuardando] = useState(false);
 
   const navigate = useNavigate();
 useEffect(() => {
@@ -47,7 +49,7 @@ useEffect(() => {
      alert("Todos los envíos deben tener una zona asignada.");
      return;
    }
- 
+   setGuardando(true)
    try {
     await crearEnvios({ enviosOCR, remitenteId, senderName, metodoPago });
  
@@ -56,7 +58,9 @@ useEffect(() => {
    } catch (error) {
      console.error("Error al guardar:", error);
      alert("Error al guardar los envíos.");
-   }
+   } finally {
+    setGuardando(false); // Termina de cargar
+  }
  };
 const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 0);
 
@@ -162,6 +166,10 @@ const totalPrecio = enviosOCR.reduce((acc, envio) => acc + (envio.precio || 0), 
           Cancelar
         </button>
       </div>
+
+      {guardando && (
+  <Spinner></Spinner>
+)}
     </div>
   )}
 </div>
