@@ -6,12 +6,11 @@ export async function registrarActivoCuentaCorriente({
   clienteNombre,
   monto,
   envios = [],
-  metodo,
   creadoPor = "admin"
 }) {
-  if (!clienteId || !monto || monto <= 0) {
-    throw new Error("Datos inválidos para registrar activo en cuenta corriente.");
-  }
+ if (!clienteId || typeof monto !== "number" || isNaN(monto)) {
+  throw new Error("Datos inválidos para registrar activo en cuenta corriente.");
+}
 
   try {
     // 1. Actualizar cuenta corriente del cliente (restar deuda)

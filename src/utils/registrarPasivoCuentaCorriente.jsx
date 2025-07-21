@@ -31,6 +31,7 @@ export async function registrarPasivoCuentaCorriente({ clienteId, clienteNombre,
       await updateDoc(envioRef, {
         estadoPago: "pendiente",
         metodoPago: "cuenta_corriente",
+        pagoId: pagoRef.id, // Asociar el pago al envío
       });
     }
     

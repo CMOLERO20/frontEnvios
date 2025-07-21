@@ -17,17 +17,22 @@ import CrearCliente from "./views/CrearCliente";
 import CrearEnviosMultiples from "./components/CrearEnviosMultiples";
 import CrearEnviosOCR from "./views/CrearEnviosOCR";
 import CrearEnviosOCRV2 from "./views/CrearEnviosOCRV2";
+import CrearEnviosMultiplesM from "./components/material/CrearEnviosMultiplesM";
 
 import dotenv from 'dotenv';
 import VistaEnvios from "./views/VistaEnvios";
 import VistaClienteById from "./views/VistaClienteById";
 import VistaClientes from "./views/VistaClientes";
 import VistaPagos from "./views/VistaPagos";
+import TablaAdmin from "./components/material/TablaAdmin";
+
+import { SnackbarProvider } from 'notistack';
 
 
 export default function App() {
   
   return (
+    <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
     <Router>
       <Routes>
         {/* Públicas */}
@@ -48,14 +53,14 @@ export default function App() {
          <Route path="/admin/clientes/:id" element={<VistaClienteById  />} />
          <Route path="/admin/pagos/" element={<VistaPagos  />} />
 
-<Route path="/admin/crear-multiples" element={<CrearEnviosMultiples />} />
+<Route path="/admin/crear-multiples" element={<CrearEnviosMultiplesM />} />
 <Route path="/admin/crear-envios-ocr" element={<CrearEnviosOCR />} />
 <Route path="/admin/crear-envios-ocr-v2" element={<CrearEnviosOCRV2 />} />
  <Route
-          path="/crear-envio"
+          path="/tabla"
           element={
             <ProtectedRoute allowedRoles={["admin",'client']}>
-              <CrearEnvio />
+              <TablaAdmin></TablaAdmin>
             </ProtectedRoute>
           }
         />
@@ -90,5 +95,6 @@ export default function App() {
         <Route path="*" element={<Login />} />
       </Routes>
     </Router>
+      </SnackbarProvider>
   );
 }
