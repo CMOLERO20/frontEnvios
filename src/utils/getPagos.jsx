@@ -1,4 +1,4 @@
-import { query, collection, getDocs, where} from "firebase/firestore";
+import { query, collection, getDocs, where , doc , getDoc} from "firebase/firestore";
 import { db } from "../firebase"; // ajustá la ruta si es diferente
 
 const getPagos = async () => {
@@ -30,4 +30,23 @@ const pagos = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   }
 };
 
-export  {getPagos, getPagosByClient}
+ const getPagoById = async (pagoId) => {
+  if (!pagoId) return null;
+
+  try {
+    const docRef = doc(db, "pagos", pagoId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    } else {
+      console.warn("No se encontró el pago con ID:", pagoId);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error al obtener el pago:", error);
+    return null;
+  }
+};
+
+export  {getPagos, getPagosByClient, getPagoById}

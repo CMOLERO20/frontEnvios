@@ -16,6 +16,11 @@ import ContadorEnvios from "../components/ContadorEnvios";
 import { RegistrarCliente } from "../components/RegistrarUsuario";
 import { useNavigate } from "react-router-dom";
 import TarjetaMenu from "../components/TarjetaMenu";
+import TablaAdmin from "../components/material/TablaAdmin";
+import { Tab } from "@mui/material";
+import { getEnvios } from "../utils/getEnvios";
+import BotonAsignarRepartidorM from "../components/material/BotonAsignarRepartidor";
+import ModalEditarEnvio from "../components/material/ModalEditarEnvio";
 
 const columnas = [
   
@@ -36,7 +41,9 @@ const columnas = [
       v ? v : <span className="text-gray-400 italic">Sin asignar</span>,
   },
 ];
+const acciones = [
 
+];
 const detalle = [
   "estado",
   "recieverName",
@@ -100,24 +107,17 @@ export default function AdminDashboard() {
   const [envios, setEnvios] = useState([]);
   const [enviosFiltrados, setEnviosFiltrados] = useState([]);
   const [seleccionados, setSeleccionados] = useState([]);
+  const [envioAEditar, setEnvioAEditar] = useState(null);
 
-   const navigate = useNavigate();
-  useEffect(() => {
-    const q = query(collection(db, "envios"));
-    const unsub = onSnapshot(q, (snap) => {
-      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setEnvios(data);
-    });
-    return () => unsub();
-  }, []);
-  useEffect(() => {
-  const unsub = onSnapshot(collection(db, "envios"), (snap) => {
-    const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    setEnvios(data);
-  });
-  return () => unsub();
-}, []);
 
+   const fetchData = async () => {
+        const data = await getEnvios();
+        setEnvios(data);
+      };
+   useEffect(() => {
+     
+      fetchData();
+    }, []);
  
   
   const toggleSeleccionado = (id) => {
@@ -163,13 +163,12 @@ export default function AdminDashboard() {
   {/* Botones de acciones */}
     <h1 className="text-2xl font-extrabold text-gray-800 mb-6">Acciones</h1>
   <div className="flex flex-wrap gap-3 items-center mb-6">
-  
-
-  <BotonAsignarRepartidor
-    enviosSeleccionados={seleccionados}
-    setSeleccionados={setSeleccionados}
-    envios={envios}
-  />
+  <BotonAsignarRepartidorM
+  enviosSeleccionados={seleccionados}
+  setSeleccionados={setSeleccionados}
+  envios={envios}
+  onActualizar={fetchData}
+/>
 
   <BotonMarcarEntregado
     envios={envios}
@@ -177,24 +176,23 @@ export default function AdminDashboard() {
     setSeleccionados={setSeleccionados}
   />
 </div>
-
-  {/* Filtros */}
-  <h1 className="text-2xl font-extrabold text-gray-800 mb-6">Filtros</h1>
-  <div >
-    <FiltrosEnvios envios={envios} onFiltrar={setEnviosFiltrados} />
-  </div>
-
-  {/* Tabla */}
-  <div className="overflow-x-auto bg-white rounded shadow mt-6">
-    <TablaEnvios
-      envios={enviosFiltrados}
-      columnas={columnas}
-      detalle={detalle}
-      etiquetas={etiquetas}
-      seleccionados={seleccionados}
-      toggleSeleccionado={toggleSeleccionado}
-    />
-  </div>
+{envios.length === 0 ? (
+  <p>Cargando envíos...</p>
+) : ( 
+  <TablaAdmin   onUpdate={() => {
+    fetchData(); // Refrescar los datos // Cerrar modal
+  }}  envios={envios}  onEditar={(envio) => setEnvioAEditar(envio)}
+     onSeleccionar={(seleccionados) => setSeleccionados(seleccionados)}  enviosSeleccionados={seleccionados}/>
+)}
+<ModalEditarEnvio
+  envio={envioAEditar}
+  open={!!envioAEditar}
+  onClose={() => setEnvioAEditar(null)}
+  onUpdate={() => {
+    fetchData(); // Refrescar los datos
+    setEnvioAEditar(null); // Cerrar modal
+  }}
+/>
 </div>
 
   );

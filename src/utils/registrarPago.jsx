@@ -37,7 +37,8 @@ export async function registrarPago({
         const envioRef = doc(db, "envios", envioId);
         await updateDoc(envioRef, {
           pagoId: docRef.id,
-          estadoPago: pago.estado, // opcional: puede ser "pendiente" o "confirmado"
+          estadoPago: pago.estado,
+          metodoPago: metodo // opcional: puede ser "pendiente" o "confirmado"
         });
 
            

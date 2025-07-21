@@ -74,21 +74,18 @@ export default function TablaEnvios({
               </td>
             ))}
 
-            {accionesPorFila && (
-              <td className="px-3 py-2 text-center border border-gray-200">
-                {accionesPorFila(envio)}
-              </td>
-            )}
+          
+  <td className="px-3 py-2 text-center border border-gray-200">
+    <button
+      onClick={() => setEnvioActivo(envio)}
+      className="text-blue-600 hover:underline transition"
+      title="Ver detalle"
+    >
+      <PlusIcon className="h-5 w-5 text-blue-500 hover:bg-sky-200 rounded-full" />
+    </button>
+  </td>
 
-            <td className="px-3 py-2 text-center border border-gray-200">
-              <button
-                onClick={() => setEnvioActivo(envio)}
-                className="text-blue-600 hover:underline transition"
-                title="Ver detalle"
-              >
-                <PlusIcon className="h-5 w-5 text-blue-500 hover:bg-sky-200 rounded-full" />
-              </button>
-            </td>
+           
           </tr>
         ))}
     </tbody>
