@@ -11,6 +11,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
   Checkbox,
   Typography,
   FormControl,
@@ -22,12 +23,20 @@ import {
 import { getEnvios } from "../utils/getEnvios";
 import dayjs from "dayjs";
 import BotonAsignarRepartidorM from "../components/material/BotonAsignarRepartidor";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
+
 
 export default function AsignarRepartidor() {
   const [envios, setEnvios] = useState([]);
   const [seleccionados, setSeleccionados] = useState([]);
   const [zonaFiltro, setZonaFiltro] = useState("");
   const [orientacionFiltro, setOrientacionFiltro] = useState("");
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
@@ -36,10 +45,9 @@ export default function AsignarRepartidor() {
     const pendientes = todos
       .filter((e) => e.estado === "Pendiente")
       .sort((a, b) => {
-        if ((a.zona || "") === (b.zona || "")) {
-          return (a.orientacion || "").localeCompare(b.orientacion || "");
-        }
-        return (a.zona || "").localeCompare(b.zona || "");
+        const fechaA = a.creado?.toDate?.() || new Date(0);
+        const fechaB = b.creado?.toDate?.() || new Date(0);
+        return fechaB - fechaA; // Más reciente primero
       });
     setEnvios(pendientes);
   };
@@ -66,9 +74,7 @@ export default function AsignarRepartidor() {
     }
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  const handleChangePage = (event, newPage) => setPage(newPage);
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -78,11 +84,28 @@ export default function AsignarRepartidor() {
   const zonas = [...new Set(envios.map((e) => e.zona).filter(Boolean))];
   const orientaciones = [...new Set(envios.map((e) => e.orientacion).filter(Boolean))];
 
-  const filtrados = envios.filter((e) => {
+ const filtrados = envios
+  .filter((e) => {
+    const creadoDate = e.creado?.toDate?.();
+    const fecha = creadoDate ? dayjs(creadoDate) : null;
+
+    const desde = fechaDesde ? dayjs(fechaDesde).startOf("day") : null;
+    const hasta = fechaHasta ? dayjs(fechaHasta).endOf("day") : null;
+
+    const cumpleDesde = !desde || (fecha && dayjs(fecha).isSameOrAfter(desde));
+    const cumpleHasta = !hasta || (fecha && dayjs(fecha).isSameOrBefore(hasta));
+
     return (
       (!zonaFiltro || e.zona === zonaFiltro) &&
-      (!orientacionFiltro || e.orientacion === orientacionFiltro)
+      (!orientacionFiltro || e.orientacion === orientacionFiltro) &&
+      cumpleDesde &&
+      cumpleHasta
     );
+  })
+  .sort((a, b) => {
+    const fechaA = a.creado?.toDate?.() || new Date(0);
+    const fechaB = b.creado?.toDate?.() || new Date(0);
+    return fechaB - fechaA;
   });
 
   const paginaActual = filtrados.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
@@ -97,31 +120,45 @@ export default function AsignarRepartidor() {
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={2} alignItems="flex-end">
         <FormControl fullWidth>
           <InputLabel>Zona</InputLabel>
-          <Select
-            value={zonaFiltro}
-            label="Zona"
-            onChange={(e) => setZonaFiltro(e.target.value)}
-          >
+          <Select value={zonaFiltro} label="Zona" onChange={(e) => setZonaFiltro(e.target.value)}>
             <MenuItem value="">Todas</MenuItem>
             {zonas.map((zona) => (
-              <MenuItem key={zona} value={zona}>{zona}</MenuItem>
+              <MenuItem key={zona} value={zona}>
+                {zona}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
         <FormControl fullWidth>
           <InputLabel>Orientación</InputLabel>
-          <Select
-            value={orientacionFiltro}
-            label="Orientación"
-            onChange={(e) => setOrientacionFiltro(e.target.value)}
-          >
+          <Select value={orientacionFiltro} label="Orientación" onChange={(e) => setOrientacionFiltro(e.target.value)}>
             <MenuItem value="">Todas</MenuItem>
             {orientaciones.map((o) => (
-              <MenuItem key={o} value={o}>{o}</MenuItem>
+              <MenuItem key={o} value={o}>
+                {o}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
+
+        <TextField
+          type="date"
+          label="Desde"
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+          value={fechaDesde}
+          onChange={(e) => setFechaDesde(e.target.value)}
+        />
+
+        <TextField
+          type="date"
+          label="Hasta"
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+          value={fechaHasta}
+          onChange={(e) => setFechaHasta(e.target.value)}
+        />
 
         <Box display="flex" alignItems="center">
           <BotonAsignarRepartidorM
@@ -142,10 +179,7 @@ export default function AsignarRepartidor() {
           <TableHead>
             <TableRow>
               <TableCell>
-                <Checkbox
-                  checked={paginaActual.length > 0 && todosSeleccionados}
-                  onChange={(e) => handleToggleAll(e.target.checked, page)}
-                />
+                <Checkbox checked={paginaActual.length > 0 && todosSeleccionados} onChange={(e) => handleToggleAll(e.target.checked, page)} />
               </TableCell>
               <TableCell>Domicilio</TableCell>
               <TableCell>Localidad</TableCell>
@@ -168,9 +202,7 @@ export default function AsignarRepartidor() {
                 <TableCell>{envio.zona}</TableCell>
                 <TableCell>{envio.orientacion || "-"}</TableCell>
                 <TableCell>
-                  {envio.creado?.toDate
-                    ? dayjs(envio.creado.toDate()).format("DD/MM/YYYY")
-                    : "-"}
+                  {envio.creado?.toDate ? dayjs(envio.creado.toDate()).format("DD/MM/YYYY") : "-"}
                 </TableCell>
               </TableRow>
             ))}
