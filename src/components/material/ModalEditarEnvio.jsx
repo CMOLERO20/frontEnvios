@@ -3,25 +3,30 @@ import {
   TextField, Stack, Button
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { doc, updateDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useSnackbar } from 'notistack';
 
 export default function ModalEditarEnvio({ envio, open, onClose, onUpdate }) {
-  const [formData, setFormData] = useState({
-    recieverName: envio?.recieverName || "",
-    recieverAddress: envio?.recieverAddress || "",
-    recieverPhone: envio?.recieverPhone || ""
-  });
-
+  const { enqueueSnackbar } = useSnackbar();
+  const [formData, setFormData] = useState({});
+  const [originalData, setOriginalData] = useState({});
   const [loading, setLoading] = useState(false);
-  const { enqueueSnackbar } = useSnackbar(); // 🔔
- const oldData = {
-    recieverName: envio?.recieverName || "",
-    recieverAddress: envio?.recieverAddress || "",
-    recieverPhone: envio?.recieverPhone || ""
-  }
+
+  // Cargar datos del envío cuando el modal se abre o cambia
+  useEffect(() => {
+    if (envio) {
+      const initial = {
+        recieverName: envio.recieverName || "",
+        recieverAddress: envio.recieverAddress || "",
+        recieverPhone: envio.recieverPhone || ""
+      };
+      setFormData(initial);
+      setOriginalData(initial);
+    }
+  }, [envio]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -30,25 +35,37 @@ export default function ModalEditarEnvio({ envio, open, onClose, onUpdate }) {
   const handleGuardar = async () => {
     setLoading(true);
     try {
-      const envioRef = doc(db, "envios", envio.id);
+      // Detectar cambios
+      const cambios = {};
+      for (const key in formData) {
+        if (formData[key] !== originalData[key]) {
+          cambios[key] = formData[key];
+        }
+      }
 
-      await updateDoc(envioRef, formData);
+      if (Object.keys(cambios).length === 0) {
+        enqueueSnackbar("No hiciste ningún cambio.", { variant: "info" });
+        setLoading(false);
+        return;
+      }
+
+      const envioRef = doc(db, "envios", envio.id);
+      await updateDoc(envioRef, cambios);
 
       await addDoc(collection(envioRef, "historial"), {
         tipo: "Modificación",
-        mensaje: `Se modificó el destinatario, dirección o teléfono`,
-        datos: oldData,
+        mensaje: `Se modificaron los campos: ${Object.keys(cambios).join(", ")}`,
+        datosAnteriores: originalData,
+        nuevosDatos: cambios,
         creado: serverTimestamp()
       });
 
-      enqueueSnackbar("Envío actualizado correctamente", { variant: "success" }); // ✅
-
+      enqueueSnackbar("Envío actualizado correctamente ✅", { variant: "success" });
       onUpdate?.();
       onClose();
-      setFormData([])
     } catch (err) {
       console.error("Error al actualizar:", err);
-      enqueueSnackbar("Hubo un error al guardar los cambios", { variant: "error" }); // ❌
+      enqueueSnackbar("Hubo un error al guardar los cambios", { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -62,21 +79,21 @@ export default function ModalEditarEnvio({ envio, open, onClose, onUpdate }) {
           <TextField
             label="Destinatario"
             name="recieverName"
-            value={formData.recieverName}
+            value={formData.recieverName || ""}
             onChange={handleChange}
             fullWidth
           />
           <TextField
             label="Domicilio"
             name="recieverAddress"
-            value={formData.recieverAddress}
+            value={formData.recieverAddress || ""}
             onChange={handleChange}
             fullWidth
           />
           <TextField
             label="Teléfono"
             name="recieverPhone"
-            value={formData.recieverPhone}
+            value={formData.recieverPhone || ""}
             onChange={handleChange}
             fullWidth
           />

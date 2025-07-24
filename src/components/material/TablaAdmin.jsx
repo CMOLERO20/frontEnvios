@@ -21,12 +21,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import ModalEliminarEnvio from "./ModalEliminarEnvio";
 import ModalDetalleEnvio from "./ModalDetalleEnvio";
-
+import ModalEditarEnvio from "./ModalEditarEnvio";
 
 
   
 
-export default function TablaEnviosConFiltros({ envios, onEditar
+export default function TablaAdmin({ envios, onEditar
   , onSeleccionar, enviosSeleccionados , onUpdate }) {
   const [filtroTexto, setFiltroTexto] = useState('');
   const [fechaDesde, setFechaDesde] = useState(null);
@@ -39,6 +39,7 @@ const [envioAEliminar, setEnvioAEliminar] = useState(null);
 const [verDetalleAbierto, setVerDetalleAbierto] = useState(false);
 const [envioDetalle, setEnvioDetalle] = useState(null);
 const [filtroEstado, setFiltroEstado] = useState("");
+const [envioAEditar, setEnvioAEditar] = useState(null);
 
 
   useEffect(() => {
@@ -131,7 +132,11 @@ const handleCerrarEliminar = () => {
   onUpdate?.(); // Refrescar tabla
    // ya tenés esta función para recargar los envíos
 };
-
+const handleCerrarEditar = () => {
+  setEnvioAEditar(null);
+  onUpdate?.(); // Refrescar tabla
+   // ya tenés esta función para recargar los envíos
+};
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Paper sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
@@ -224,7 +229,7 @@ const handleCerrarEliminar = () => {
       <TableCell>{formatFecha(envio.creado)}</TableCell>
       <TableCell>{envio.motoName || '-'}</TableCell>
       <TableCell align="center">
-        <IconButton color="primary" size="small" onClick={() => onEditar?.(envio)} disabled={envio.estado === "Cancelado" || envio.estado === "Entregado"}>
+        <IconButton color="primary" size="small" onClick={() => setEnvioAEditar?.(envio)} disabled={envio.estado === "Cancelado" || envio.estado === "Entregado"}>
           <Edit fontSize="small" />
         </IconButton>
         <IconButton color="error" size="small" onClick={() => setEnvioAEliminar?.(envio)}  disabled={envio.estado === "Cancelado"}>
@@ -272,6 +277,13 @@ const handleCerrarEliminar = () => {
   abierto={verDetalleAbierto}
   onCerrar={() => setVerDetalleAbierto(false)}
 />
+<ModalEditarEnvio
+  envio={envioAEditar}
+  open={!!envioAEditar}
+  onClose={handleCerrarEditar}
+  
+/>
+
       </Paper>
     </LocalizationProvider>
   );

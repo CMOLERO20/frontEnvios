@@ -1,88 +1,106 @@
-// src/views/MotoDashboard.jsx
-import React, { useEffect, useState } from "react";
+import {
+  Container,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Button,
+  Box,
+  Paper
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth} from "../firebase";
+import { auth } from "../firebase";
 import { Link } from "react-router-dom";
-import ContadorEnvios from "../components/ContadorEnvios";
-import { TruckIcon, CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import TarjetaEnvios from "../components/TarjetaEnvios";
 import { getEnviosPorRepartidor } from "../utils/getEnviosPorRepartidor";
+import ContadorEnvios from "../components/ContadorEnvios";
+import TarjetaEnvios from "../components/TarjetaEnvios";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 export default function MotoDashboard() {
   const [user, setUser] = useState(null);
   const [envios, setEnvios] = useState([]);
-  
-  
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => setUser(u));
     return () => unsub();
   }, []);
 
- useEffect(() => {
-  if (!user) return;
+  useEffect(() => {
+    if (!user) return;
+    const unsubscribe = getEnviosPorRepartidor(user.uid, (data) => {
+      const activos = data.filter((e) => e.activo === true);
+      setEnvios(activos);
+    });
+    return () => unsubscribe();
+  }, [user]);
 
-  const unsubscribe = getEnviosPorRepartidor(user.uid, (data) => {
-    const activos = data.filter((e) => e.activo === true);
-    setEnvios(activos);
-  });
+  const activos = envios.filter((e) => e.activo);
 
-  return () => unsubscribe();
-}, [user]);
-
-  const activos = envios.filter((e) => e.activo == true);
- 
-
-  if (!user) return <p className="p-4">Cargando...</p>;
+  if (!user) return <p>Cargando...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-6 lg:px-12">
-      <h2 className="text-3xl font-extrabold text-gray-800 mb-6">Bienvenido, repartidor</h2>
+    <Container maxWidth="sm" sx={{ py: 4 }}>
+      <Typography variant="h5" fontWeight="bold" gutterBottom>
+        Bienvenido, repartidor
+      </Typography>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-             <ContadorEnvios
-          envios={envios}
-          estado={["En camino", "Yendo al domicilio",'Pendiente','Demorado']}
-          titulo="Envíos activos"
-        />
-             <ContadorEnvios
-          envios={envios}
-          estado={[]}
-          titulo="Demorados"
-          color="text-red-600"
-          flagDemorado={true}
-        />
-      
-      </div>
+      <Grid container spacing={2} mb={3}>
+        <Grid item xs={6}>
+          <ContadorEnvios
+            envios={envios}
+            estado={["En camino", "Yendo al domicilio", "Pendiente", "Demorado"]}
+            titulo="Envíos activos"
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <ContadorEnvios
+            envios={envios}
+            estado={[]}
+            titulo="Demorados"
+            color="text-red-600"
+            flagDemorado={true}
+          />
+        </Grid>
+      </Grid>
 
-      <h3 className="text-2xl font-extrabold text-gray-800 mb-6">Envíos activos</h3>
-   <div className="grid gap-4 mb-6">
-  {activos.length === 0 ? (
-    <p className="text-gray-500">No tenés envíos activos.</p>
-  ) : (
-    
-        <TarjetaEnvios   envios={activos} />
-   
-  )}
-</div>
+      <Typography variant="h6" fontWeight="bold" gutterBottom>
+        Envíos activos
+      </Typography>
 
+      <Box mb={3}>
+        {activos.length === 0 ? (
+          <Typography color="text.secondary">No tenés envíos activos.</Typography>
+        ) : (
+          <TarjetaEnvios envios={activos} />
+        )}
+      </Box>
 
-
- <div className=" p-4 rounded shadow bg-white flex items-center gap-4 hover:bg-gray-50 transition">
-  <div className="flex items-center gap-3">
-    <CheckCircleIcon className="h-6 w-6 text-green-500" />
-    <div>
-      <p className="font-semibold text-gray-800">Envíos finalizados</p>
-      <Link
-    to="/moto/finalizados"
-    className="text-sm text-blue-600 hover:underline font-medium"
-  >
-    Ver Historial de Entregas
-  </Link>
-    </div>
-  </div>
-  
-</div>
-    </div>
+      <Paper
+        elevation={2}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+          p: 2,
+          ":hover": { backgroundColor: "#f9f9f9" }
+        }}
+      >
+        <CheckCircleIcon color="success" />
+        <Box>
+          <Typography variant="subtitle1" fontWeight="medium">
+            Envíos finalizados
+          </Typography>
+          <Button
+            component={Link}
+            to="/moto/finalizados"
+            variant="text"
+            size="small"
+          >
+            Ver Historial de Entregas
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 }

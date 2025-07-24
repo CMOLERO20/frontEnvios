@@ -22,7 +22,7 @@ export async function registrarPasivoCuentaCorriente({ clienteId, clienteNombre,
       creadoPor,
       envios,
       estado: "pendiente",
-      fecha: Timestamp.now(),
+      creado: Timestamp.now(),
     });
 
 

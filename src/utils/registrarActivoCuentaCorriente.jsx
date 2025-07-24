@@ -1,7 +1,7 @@
 import { doc, updateDoc, increment, collection, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "../firebase";
 
-export async function registrarActivoCuentaCorriente({
+export  async function registrarActivoCuentaCorriente({
   clienteId,
   clienteNombre,
   monto,
@@ -28,7 +28,7 @@ export async function registrarActivoCuentaCorriente({
       creadoPor,
       envios,
       estado: "confirmado",
-      fecha: Timestamp.now(),
+      creado: Timestamp.now(),
     });
 
     // 3. Actualizar estado de pago de los envíos (opcional)

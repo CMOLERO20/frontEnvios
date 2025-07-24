@@ -40,17 +40,16 @@ export default function ModalDetalleEnvio({ envio, abierto, onCerrar }) {
     };
 
     const cargarFoto = async () => {
-      if (!envio.fotoURL) return;
+      if (!envio.nombreArchivo) return;
       setCargandoFoto(true);
       try {
-        
+        const url = await getDownloadURL(ref(storage, `etiquetas/${envio.nombreArchivo}`));
         setFotoURL(envio.fotoURL || url);
       } catch (error) {
         console.warn("No se pudo cargar la imagen:", error);
       } finally {
         setCargandoFoto(false);
       }
-        console.log("🚀 ~ cargarFoto ~ envio.fotoURL:", envio.fotoURL)
     };
 
     cargarHistorial();

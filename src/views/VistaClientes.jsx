@@ -1,12 +1,24 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Typography,
+  TextField,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TablePagination,
+  Paper,
+} from "@mui/material";
 import { getClients } from "../utils/getClients";
-import FiltroBusqueda from "../components/elementos/FiltroBusqueda";
-import TarjetaResumen from "../components/elementos/TarjetaResumen";
 
 export default function VistaClientes() {
   const [clientes, setClientes] = useState([]);
   const [filtro, setFiltro] = useState("");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,22 +39,69 @@ export default function VistaClientes() {
     )
   );
 
+  const handleChangePage = (_, newPage) => setPage(newPage);
+  const handleChangeRowsPerPage = (e) => {
+    setRowsPerPage(parseInt(e.target.value, 10));
+    setPage(0);
+  };
+
+  const paginados = clientesFiltrados.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">👥 Clientes</h2>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Typography variant="h5" fontWeight="bold" gutterBottom>
+        👥 Clientes
+      </Typography>
 
-      <FiltroBusqueda value={filtro} onChange={(e) => setFiltro(e.target.value)} />
+      <TextField
+        label="Buscar cliente"
+        variant="outlined"
+        fullWidth
+        value={filtro}
+        onChange={(e) => setFiltro(e.target.value)}
+        sx={{ mb: 3 }}
+      />
 
-      <div className="grid gap-3 mt-4">
-        {clientesFiltrados.map((cliente) => (
-          <TarjetaResumen
-            key={cliente.uid}
-            titulo={cliente.nombre || cliente.email}
-            subtitulo={`Email: ${cliente.email} cliente id: ${cliente.uid}`}
-            onClick={() => navigate(`/admin/clientes/${cliente.id}`)}
-          />
-        ))}
-      </div>
-    </div>
+      <Paper>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Teléfono</TableCell>
+              <TableCell>Cuenta Corriente</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginados.map((cliente) => (
+              <TableRow
+                key={cliente.uid}
+                hover
+                sx={{ cursor: "pointer" }}
+                onClick={() => navigate(`/admin/clientes/${cliente.id}`)}
+              >
+                <TableCell>{cliente.nombre || "-"}</TableCell>
+                <TableCell>{cliente.email}</TableCell>
+                <TableCell>{cliente.telefono || "-"}</TableCell>
+                <TableCell>{cliente.cuentaCorriente}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 50]}
+          component="div"
+          count={clientesFiltrados.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+    </Container>
   );
 }

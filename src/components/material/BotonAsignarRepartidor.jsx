@@ -11,15 +11,17 @@ import {
 import { doc, updateDoc, collection, getDocs, where, query } from "firebase/firestore";
 import { db } from "../../firebase";
 import registrarCambioEstado from "../../utils/registrarCambioEstado";
+import { useSnackbar } from "notistack";
 
 export default function BotonAsignarRepartidorM({ enviosSeleccionados, setSeleccionados, envios, onActualizar }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [motos, setMotos] = useState([]);
   const [motoSeleccionada, setMotoSeleccionada] = useState("");
+  const { enqueueSnackbar } = useSnackbar();
 
   const puedeAsignarRepartidor = envios
     .filter((e) => enviosSeleccionados.includes(e.id))
-    .every((e) => e.estado === "Pendiente");
+  .every((e) => e.estado === "Pendiente")
 
   useEffect(() => {
     const fetchMotos = async () => {
@@ -49,27 +51,37 @@ export default function BotonAsignarRepartidorM({ enviosSeleccionados, setSelecc
   const asignarMoto = async () => {
     if (!motoSeleccionada) return;
 
-    const updates = enviosSeleccionados.map(async (id) => {
-      const envioRef = doc(db, "envios", id);
-      await updateDoc(envioRef, {
-        motoId: motoSeleccionada,
-        motoName: motos.find((m) => m.id === motoSeleccionada)?.email || "",
-      });
+    const moto = motos.find((m) => m.id === motoSeleccionada);
+    if (!moto) return;
 
-      await registrarCambioEstado(id, "En camino");
-    });
+    try {
+      const updates = enviosSeleccionados.map(async (envio) => {
+  const envioRef = doc(db, "envios", envio.id);
 
-    await Promise.all(updates);
-    setSeleccionados([]);
-    cerrarModal();
-    onActualizar?.(); // Llama a la recarga del padre si existe
+  await updateDoc(envioRef, {
+    motoId: motoSeleccionada,
+    motoName: motos.find((m) => m.id === motoSeleccionada)?.email || "",
+  });
+
+  await registrarCambioEstado(envio.id, "En camino");
+});
+
+      await Promise.all(updates);
+      enqueueSnackbar("Envíos asignados correctamente", { variant: "success" });
+    } catch (err) {
+      enqueueSnackbar("Error al asignar envíos", { variant: "error" });
+      console.error(err);
+    } finally {
+      setSeleccionados([]);
+      cerrarModal();
+      onActualizar?.();
+    }
   };
 
   return (
     <>
       <Button
         variant="contained"
-       
         onClick={abrirModal}
         disabled={enviosSeleccionados.length === 0 || !puedeAsignarRepartidor}
       >

@@ -7,14 +7,14 @@ import {
  
 } from "firebase/firestore";
 import BotonMarcarEntregado from "../components/BotonMarcarEntregado";
-import BotonAsignarRepartidor from "../components/BotonAsignarRepartidor";
+
 import BotonCrearEnvio from "../components/BotonCrearEnvio";
 import FiltrosEnvios from "../components/FiltrosEnvios";
 import formatearFecha from "../utils/formatearFecha";
 import TablaEnvios from "../components/TablaEnvios";
 import ContadorEnvios from "../components/ContadorEnvios";
 import { RegistrarCliente } from "../components/RegistrarUsuario";
-import { useNavigate } from "react-router-dom";
+
 import TarjetaMenu from "../components/TarjetaMenu";
 import TablaAdmin from "../components/material/TablaAdmin";
 import { Tab } from "@mui/material";
@@ -22,49 +22,6 @@ import { getEnvios } from "../utils/getEnvios";
 import BotonAsignarRepartidorM from "../components/material/BotonAsignarRepartidor";
 import ModalEditarEnvio from "../components/material/ModalEditarEnvio";
 
-const columnas = [
-  
-  { key: "recieverName", label: "Destinatario" },
-  { key: "recieverAddress", label: "Destino" },
-  {
-    key: "creado",
-    label: "Fecha",
-    render: (v) => formatearFecha(v),
-  },
-  { key: "localidad", label: "Localidad" },
-  { key: "zona", label: "Zona" },
-  { key: "estado", label: "Estado" },
-  {
-    key: "motoName",
-    label: "Repartidor",
-    render: (v) =>
-      v ? v : <span className="text-gray-400 italic">Sin asignar</span>,
-  },
-];
-const acciones = [
-
-];
-const detalle = [
-  "estado",
-  "recieverName",
-  "recieverAddress",
-  "zona",
-  "numeroEnvio",
-  "creado",
-  "senderName",
-  "motoName",
-];
-
-const etiquetas = {
-  estado: "Estado",
-  recieverName: "Receptor",
-  motoName: "Repartidor",
-  numeroEnvio: "N° de Envío",
-  zona: "Zona",
-  creado: "Fecha de Creación",
-  senderName: "Remitente",
-  recieverAddress: "Dirección de Entrega",
-};
 
 const categorias = [
   {
