@@ -65,7 +65,6 @@ export default function ModalDetalleEnvio({ envio, abierto, onCerrar }) {
       <DialogTitle>Detalle del Envío {envio.numeroEnvio || ""}</DialogTitle>
       <DialogContent dividers>
         <Grid container spacing={2}>
-           <Campo label="Venta" valor={envio.fotoURL || '-'} />
           <Campo label="Venta" valor={envio.venta || '-'} />
           <Campo label="Estado" valor={envio.estado} />
           <Campo label="Destinatario" valor={envio.recieverName} />
