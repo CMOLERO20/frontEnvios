@@ -40,7 +40,7 @@ export default function ModalDetalleEnvio({ envio, abierto, onCerrar }) {
     };
 
     const cargarFoto = async () => {
-      if (!envio.nombreArchivo) return;
+      if (!envio.fotoURL) return;
       setCargandoFoto(true);
       try {
         const url = await getDownloadURL(ref(storage, `etiquetas/${envio.nombreArchivo}`));
@@ -63,6 +63,7 @@ export default function ModalDetalleEnvio({ envio, abierto, onCerrar }) {
       <DialogTitle>Detalle del Envío {envio.numeroEnvio || ""}</DialogTitle>
       <DialogContent dividers>
         <Grid container spacing={2}>
+          <Campo label="Venta" valor={envio.venta || '-'} />
           <Campo label="Estado" valor={envio.estado} />
           <Campo label="Destinatario" valor={envio.recieverName} />
           <Campo label="Dirección" valor={envio.recieverAddress} />
