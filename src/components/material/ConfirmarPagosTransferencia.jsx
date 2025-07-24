@@ -67,7 +67,7 @@ export default function ConfirmarPagosTransferencia() {
               <TableRow key={p.id}>
                 <TableCell>{p.clienteNombre || "-"}</TableCell>
                 <TableCell>${p.monto.toLocaleString("es-AR")}</TableCell>
-                <TableCell>{p.creado?.toDate ? dayjs(p.creado.toDate()).format("DD/MM/YYYY") : "-"}</TableCell>
+                <TableCell>{p.creado?.toDate ? dayjs(p.creado.toDate()).format("DD/MM/YYYY") : dayjs(p.fecha.toDate()).format("DD/MM/YYYY")}</TableCell>
                 <TableCell>{p.envios?.length || 0}</TableCell>
                 <TableCell>
                   <Button
