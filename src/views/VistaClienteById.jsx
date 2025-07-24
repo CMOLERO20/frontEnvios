@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import TarjetaResumen from "../components/elementos/TarjetaResumen";
-import BotonVolver from "../components/elementos/BotonVolver";
+import { useParams, useNavigate } from "react-router-dom";
 import { getClient } from "../utils/getClients";
 import { getEnviosById } from "../utils/getEnvios";
 import { getPagosByClient } from "../utils/getPagos";
-import ListaEnviosCliente from "../components/elementos/ListaEnviosCliente";
+import {
+  Container,
+  Typography,
+  Grid,
+  Paper,
+  Box,
+  Divider,
+  Card,
+  CardContent,
+  IconButton,
+  Tooltip
+} from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import TablaEnviosCliente from "../components/material/TablaEnviosCliente";
+import TablaPagosCliente from "../components/material/TablaPagosClientes";
 
 export default function VistaClienteById() {
   const { id } = useParams();
-  console.log("🚀 ~ VistaClienteById ~  id:",  id)
+  const navigate = useNavigate();
   const [cliente, setCliente] = useState(null);
   const [envios, setEnvios] = useState([]);
   const [pagos, setPagos] = useState([]);
@@ -34,39 +46,73 @@ export default function VistaClienteById() {
   const porcentajeDemorados = totalEnvios ? Math.round((demorados / totalEnvios) * 100) : 0;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <BotonVolver ruta="/admin" />
-      <h2 className="text-2xl font-bold mb-4">👤 Cliente: {cliente?.nombre || cliente?.email}</h2>
+    <Container maxWidth="md" sx={{ mt: 4 }}>
+      <Box mb={2}>
+        <Tooltip title="Volver">
+          <IconButton onClick={() => navigate("/admin/clientes")}> 
+            <ArrowBackIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="p-4 bg-white rounded shadow text-center">
-          <h3 className="text-sm text-gray-500">Total de Envíos</h3>
-          <p className="text-xl font-bold">{totalEnvios}</p>
-        </div>
-        <div className="p-4 bg-white rounded shadow text-center">
-          <h3 className="text-sm text-gray-500">% de Demorados</h3>
-          <p className="text-xl font-bold text-yellow-600">{porcentajeDemorados}%</p>
-        </div>
-        <div className="p-4 bg-white rounded shadow text-center col-span-2">
-          <h3 className="text-sm text-gray-500">Estado de Cuenta Corriente</h3>
-          <p className="text-xl font-bold text-blue-700">${cliente?.cuentaCorriente?.toLocaleString("es-AR") || 0}</p>
-        </div>
-      </div>
+      <Typography variant="h5" fontWeight="bold" gutterBottom>
+        👤 Cliente: {cliente?.nombre || cliente?.email}
+      </Typography>
 
-      <div className="mb-4">
-       <ListaEnviosCliente envios={envios} />
-      </div>
+      <Grid container spacing={2} mb={4}>
+        <Grid item xs={6}>
+          <Card>
+            <CardContent sx={{ textAlign: "center" }}>
+              <Typography variant="body2" color="text.secondary">
+                Total de Envíos
+              </Typography>
+              <Typography variant="h6" fontWeight="bold">
+                {totalEnvios}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6}>
+          <Card>
+            <CardContent sx={{ textAlign: "center" }}>
+              <Typography variant="body2" color="text.secondary">
+                % de Demorados
+              </Typography>
+              <Typography variant="h6" color="warning.main" fontWeight="bold">
+                {porcentajeDemorados}%
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent sx={{ textAlign: "center" }}>
+              <Typography variant="body2" color="text.secondary">
+                Estado de Cuenta Corriente
+              </Typography>
+              <Typography variant="h6" color="primary" fontWeight="bold">
+                ${cliente?.cuentaCorriente?.toLocaleString("es-AR") || 0}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-      <div>
-        <h3 className="text-lg font-semibold mb-2">💰 Pagos</h3>
-        {pagos.map((p) => (
-          <TarjetaResumen
-            key={p.id}
-            titulo={`Método: ${p.metodo}`}
-            subtitulo={`Monto: $${p.monto.toLocaleString("es-AR")} – Estado: ${p.estado}`}
-          />
-        ))}
-      </div>
-    </div>
+      <Box mb={4}>
+        <Typography variant="h6" gutterBottom>
+          📦 Envíos
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+        <TablaEnviosCliente envios={envios} />
+      </Box>
+
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          💰 Pagos
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+        <TablaPagosCliente pagos={pagos} />
+      </Box>
+    </Container>
   );
 }

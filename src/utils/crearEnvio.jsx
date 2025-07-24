@@ -51,7 +51,7 @@ console.log("Envío guardado con ID:", docRef.id);
 
     await addDoc(collection(docRef, "historial"), {
       estado: "Pendiente",
-      fecha: Timestamp.now(),
+      creado: Timestamp.now(),
     });
   }
 

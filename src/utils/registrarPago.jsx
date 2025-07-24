@@ -21,7 +21,7 @@ export async function registrarPago({
     creadoPor,
     envios,
     estado: metodo === "efectivo" ? "confirmado" : "pendiente",
-    fecha: Timestamp.now(),
+    creado: Timestamp.now(),
   };
 
   try {
@@ -39,6 +39,7 @@ export async function registrarPago({
           pagoId: docRef.id,
           estadoPago: pago.estado,
           metodoPago: metodo // opcional: puede ser "pendiente" o "confirmado"
+
         });
 
            

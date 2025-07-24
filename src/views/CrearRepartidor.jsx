@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import CrearClienteForm from "../components/material/CrearClienteForm";
 import { Paper, Typography, Container } from "@mui/material";
+import  CrearRepartidorForm from "../components/material/CrearRepartidorForm";
 
-export default function CrearCliente() {
+export default function CrearRepartidor() {
   const navigate = useNavigate();
 
   const handleExito = () => {
@@ -13,9 +13,9 @@ export default function CrearCliente() {
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Paper sx={{ p: 3 }}>
         <Typography variant="h5" gutterBottom>
-          Crear Cliente
+          Crear Repartidor
         </Typography>
-        <CrearClienteForm onExito={handleExito} />
+        <CrearRepartidorForm onExito={handleExito} />
       </Paper>
     </Container>
   );

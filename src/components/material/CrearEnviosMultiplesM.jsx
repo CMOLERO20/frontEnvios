@@ -1,3 +1,4 @@
+// src/views/CrearEnviosMultiples.jsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -19,7 +20,8 @@ import {
   Card,
   CardContent,
   Stack,
-  Alert
+  Alert,
+  Container
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import obtenerPrecioPorZona from "../../utils/obtenerPrecioPorZona";
@@ -52,7 +54,8 @@ export default function CrearEnviosMultiples() {
     const fetchUsuarios = async () => {
       try {
         const cliente = await getClients();
-        setUsuarios(cliente);
+        const ordenados = cliente.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        setUsuarios(ordenados);
       } catch (error) {
         console.log(error);
       }
@@ -93,7 +96,7 @@ export default function CrearEnviosMultiples() {
       setGuardando(true);
       await crearEnvios({ enviosOCR: envios, remitenteId, senderName, metodoPago });
       enqueueSnackbar("Envíos creados correctamente ✅", { variant: "success" });
-      navigate("/admin");
+      navigate("/admin/envios");
     } catch (error) {
       console.error("Error al crear envíos:", error);
       setMensaje({ tipo: "error", texto: "Hubo un error al crear los envíos." });
@@ -103,9 +106,7 @@ export default function CrearEnviosMultiples() {
   };
 
   return (
-    
-    <Box maxWidth="md" mx="auto" p={2}>
-
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" fontWeight="bold" gutterBottom>Crear Múltiples Envíos</Typography>
 
       {mensaje && (
@@ -113,14 +114,39 @@ export default function CrearEnviosMultiples() {
       )}
 
       <Paper sx={{ p: 3, mb: 4 }} elevation={3}>
-       
-<Typography variant="h6" gutterBottom>Datos del Envío</Typography>
-        <Grid container spacing={2} columns={12} mt={1}>
-          <Grid sx={{ gridColumn: { xs: 'span 12', sm: 'span 6' } }}><TextField label="Destinatario" name="recieverName" fullWidth required value={form.recieverName} onChange={handleChange} /></Grid>
-          <Grid sx={{ gridColumn: { xs: 'span 12', sm: 'span 6' } }}><TextField label="DNI" name="recieverDni" fullWidth value={form.recieverDni} onChange={handleChange} /></Grid>
-          <Grid sx={{ gridColumn: { xs: 'span 12', sm: 'span 6' } }}><TextField label="Teléfono" name="recieverPhone" fullWidth value={form.recieverPhone} onChange={handleChange} /></Grid>
-          <Grid sx={{ gridColumn: { xs: 'span 12', sm: 'span 6' } }}><TextField label="Domicilio*" name="recieverAddress" fullWidth required value={form.recieverAddress} onChange={handleChange} /></Grid>
-          <Grid sx={{ gridColumn: { xs: 'span 12', sm: 'span 9' } }}>
+        <Typography variant="h6" gutterBottom>Remitente</Typography>
+        <Grid container spacing={2} mb={2}>
+          
+          <Grid item xs={12}>
+            <FormControl fullWidth required error={!remitenteId}>
+              <InputLabel>Remitente</InputLabel>
+              <Select
+                sx={{ gridColumn: { width: '222px' } }}
+                value={remitenteId}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  const usuario = usuarios.find((u) => u.uid === id);
+                  setRemitenteId(id);
+                  setSenderName(usuario?.nombre || "");
+                }}
+                label="Remitente"
+              >
+                <MenuItem value="">Seleccionar remitente</MenuItem>
+                {usuarios.map((u) => (
+                  <MenuItem key={u.id} value={u.uid}>{u.nombre} ({u.email})</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+
+        <Typography variant="h6" gutterBottom>Destinatario</Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}><TextField label="Destinatario" name="recieverName" fullWidth required value={form.recieverName} onChange={handleChange} /></Grid>
+          <Grid item xs={12} sm={6}><TextField label="DNI" name="recieverDni" fullWidth value={form.recieverDni} onChange={handleChange} /></Grid>
+          <Grid item xs={12} sm={6}><TextField label="Teléfono" name="recieverPhone" fullWidth value={form.recieverPhone} onChange={handleChange} /></Grid>
+          <Grid item xs={12} sm={6}><TextField label="Domicilio*" name="recieverAddress" fullWidth required value={form.recieverAddress} onChange={handleChange} /></Grid>
+           <Grid sx={{ gridColumn: { xs: 'span 12', sm: 'span 9' } }}>
             <FormControl fullWidth required>
               <InputLabel>Localidad*</InputLabel>
               <Select
@@ -144,7 +170,7 @@ export default function CrearEnviosMultiples() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid sx={{ gridColumn: { xs: 'span 12', sm: 'span 3' } }}><TextField label="Zona" name="zona" fullWidth value={form.zona} InputProps={{ readOnly: true }} /></Grid>
+          <Grid item xs={12} sm={3}><TextField label="Zona" name="zona" fullWidth value={form.zona} InputProps={{ readOnly: true }} /></Grid>
         </Grid>
 
         <FormControlLabel
@@ -165,41 +191,12 @@ export default function CrearEnviosMultiples() {
       {envios.length > 0 && (
         <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
           <Typography variant="h6" gutterBottom>Envíos cargados ({envios.length})</Typography>
-          <Typography variant="body2" mb={2}>Total: ${envios.reduce((sum, e) => sum + (e.precio || obtenerPrecioPorZona(e.zona)), 0).toLocaleString("es-AR")}</Typography>
-
- <FormControl fullWidth margin="normal" required error={!remitenteId}>
-          <InputLabel>Remitente</InputLabel>
-          <Select
-            value={remitenteId}
-            onChange={(e) => {
-              const id = e.target.value;
-              const usuario = usuarios.find((u) => u.uid === id);
-              setRemitenteId(id);
-              setSenderName(usuario?.nombre || "");
-            }}
-            label="Remitente"
-          >
-            <MenuItem value="">Seleccionar remitente</MenuItem>
-            {usuarios.map((u) => (
-              <MenuItem key={u.id} value={u.uid}>{u.nombre} ({u.email})</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-          <FormControl component="fieldset" sx={{ mb: 2 }} required error={!metodoPago}>
-            <FormLabel component="legend">Método de Pago</FormLabel>
-            <RadioGroup row value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)}>
-              <FormControlLabel value="efectivo" control={<Radio />} label="Efectivo" />
-              <FormControlLabel value="transferencia" control={<Radio />} label="Transferencia" />
-              <FormControlLabel value="cuenta_corriente" control={<Radio />} label="Cuenta Corriente" />
-            </RadioGroup>
-          </FormControl>
-
           {envios.map((e, i) => (
             <Card key={i} variant="outlined" sx={{ mb: 2 }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Box>
-                    <Typography variant="body2"><strong>{e.recieverName}</strong> </Typography>
+                    <Typography variant="body2"><strong>{e.recieverName}</strong></Typography>
                     <Typography variant="body2">{e.recieverAddress}, {e.localidad} ({e.zona})</Typography>
                   </Box>
                   <Button color="error" size="small" onClick={() => setEnvios((prev) => prev.filter((_, index) => index !== i))}>Eliminar</Button>
@@ -210,25 +207,44 @@ export default function CrearEnviosMultiples() {
         </Paper>
       )}
 
+      {envios.length > 0 && (
+        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+          <Typography variant="h6" gutterBottom>Resumen y Pago</Typography>
+          <Typography variant="body2" mb={2}>Cantidad de envíos: {envios.length}</Typography>
+          <Typography variant="body2" mb={2}>Total a pagar: ${envios.reduce((sum, e) => sum + (e.precio || obtenerPrecioPorZona(e.zona)), 0).toLocaleString("es-AR")}</Typography>
+
+          <FormControl component="fieldset" required error={!metodoPago}>
+            <FormLabel component="legend">Método de Pago</FormLabel>
+            <RadioGroup row value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)}>
+              <FormControlLabel value="efectivo" control={<Radio />} label="Efectivo" />
+              <FormControlLabel value="transferencia" control={<Radio />} label="Transferencia" />
+              <FormControlLabel value="cuenta_corriente" control={<Radio />} label="Cuenta Corriente" />
+            </RadioGroup>
+          </FormControl>
+        </Paper>
+      )}
+
       <Box display="flex" gap={2}>
         <Button variant="contained" color="primary" onClick={guardarEnvios}>Crear Envíos</Button>
         <Button variant="outlined" onClick={() => navigate("/admin")}>Cancelar</Button>
       </Box>
 
-      {guardando && <Box
-    position="fixed"
-    top={0}
-    left={0}
-    width="100vw"
-    height="100vh"
-    bgcolor="rgba(255,255,255,0.6)"
-    display="flex"
-    alignItems="center"
-    justifyContent="center"
-    zIndex={9999}
-  >
-    <CircularProgress size={80} />
-  </Box>}
-    </Box>
+      {guardando && (
+        <Box
+          position="fixed"
+          top={0}
+          left={0}
+          width="100vw"
+          height="100vh"
+          bgcolor="rgba(255,255,255,0.6)"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          zIndex={9999}
+        >
+          <CircularProgress size={80} />
+        </Box>
+      )}
+    </Container>
   );
 }
