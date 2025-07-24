@@ -110,6 +110,7 @@ export default function TablaPagosCliente({ pagos }) {
         <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>
+              <TableCell>Cliente</TableCell>
               <TableCell>Método</TableCell>
               <TableCell>Monto</TableCell>
               <TableCell>Envíos</TableCell>
@@ -122,6 +123,7 @@ export default function TablaPagosCliente({ pagos }) {
               .slice(pagina * pagosPorPagina, pagina * pagosPorPagina + pagosPorPagina)
               .map((pago) => (
                 <TableRow key={pago.id}>
+                  <TableCell>{pago.clienteNombre}</TableCell>
                   <TableCell>{pago.metodo}</TableCell>
                   <TableCell>${pago.monto.toLocaleString("es-AR")}</TableCell>
                    <TableCell>{pago.envios?.length || 0}</TableCell>

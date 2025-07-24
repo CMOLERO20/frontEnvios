@@ -40,18 +40,20 @@ export default function ModalDetalleEnvio({ envio, abierto, onCerrar }) {
     };
 
     const cargarFoto = async () => {
-      if (!envio.fotoURL) return;
-      setCargandoFoto(true);
-      try {
-        const url = await getDownloadURL(ref(storage, `etiquetas/${envio.nombreArchivo}`));
-        setFotoURL(envio.fotoURL || url);
-      } catch (error) {
-        console.warn("No se pudo cargar la imagen:", error);
-      } finally {
-        setCargandoFoto(false);
-      }
-    };
-
+  setCargandoFoto(true);
+  try {
+    if (envio.fotoURL) {
+      console.log("Cargando foto:", envio.fotoURL);
+      setFotoURL(envio.fotoURL);
+    } else {
+      console.warn("No hay URL de foto");
+    }
+  } catch (error) {
+    console.error("Error al cargar la imagen:", error);
+  } finally {
+    setCargandoFoto(false);
+  }
+};
     cargarHistorial();
     cargarFoto();
   }, [envio, abierto]);
@@ -91,7 +93,11 @@ export default function ModalDetalleEnvio({ envio, abierto, onCerrar }) {
                   <strong>{h.fecha?.toDate().toLocaleString("es-AR", {
                 dateStyle: "short",
                 timeStyle: "short",
-              })}</strong> {h.estado}
+              })}</strong> 
+              <strong>{h.creado?.toDate().toLocaleString("es-AR", {
+                dateStyle: "short",
+                timeStyle: "short",
+              })}</strong>{h.estado}
                   {h.usuario && ` por ${h.usuario}`}
                 </Typography>
               </li>
