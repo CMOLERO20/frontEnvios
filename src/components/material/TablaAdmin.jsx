@@ -59,6 +59,8 @@ const [envioAEditar, setEnvioAEditar] = useState(null);
       const t = filtroTexto.toLowerCase();
       nuevos = nuevos.filter(
         (e) =>
+            e.senderName?.toLowerCase().includes(t) ||
+          e.venta?.toLowerCase().includes(t) ||
           e.recieverAddress?.toLowerCase().includes(t) ||
           e.localidad?.toLowerCase().includes(t) ||
           e.zona?.toLowerCase().includes(t) ||
