@@ -202,9 +202,10 @@ const handleCerrarEditar = () => {
       />
     </TableCell>
      <TableCell sx={{ bgcolor: 'grey.100' }}>Remitente</TableCell>
+       <TableCell sx={{ bgcolor: 'grey.100' }}>MLID</TableCell>
     <TableCell sx={{ bgcolor: 'grey.100' }}>Dirección</TableCell>
-    <TableCell sx={{ bgcolor: 'grey.200' }}>Localidad</TableCell>
-    <TableCell sx={{ bgcolor: 'grey.200' }}>Zona</TableCell>
+    <TableCell sx={{ bgcolor: 'grey.100' }}>Localidad</TableCell>
+    <TableCell sx={{ bgcolor: 'grey.100' }}>Zona</TableCell>
     <TableCell sx={{ bgcolor: 'grey.200' }}>Estado</TableCell>
     <TableCell sx={{ bgcolor: 'grey.200' }}>Fecha</TableCell>
     <TableCell sx={{ bgcolor: 'grey.200' }}>Repartidor</TableCell>
@@ -222,6 +223,7 @@ const handleCerrarEditar = () => {
         />
       </TableCell>
       <TableCell>{envio.senderName || '-'}</TableCell>
+      <TableCell>{envio.venta || '-'}</TableCell>
       <TableCell>{envio.recieverAddress || '-'}</TableCell>
       <TableCell>{envio.localidad || '-'}</TableCell>
       <TableCell>{envio.zona || '-'}</TableCell>
