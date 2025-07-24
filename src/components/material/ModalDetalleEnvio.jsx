@@ -42,9 +42,9 @@ export default function ModalDetalleEnvio({ envio, abierto, onCerrar }) {
     const cargarFoto = async () => {
   setCargandoFoto(true);
   try {
-    if (envio.fotoURL) {
-      console.log("Cargando foto:", envio.fotoURL);
-      setFotoURL(envio.fotoURL);
+    if (envio.fotoUrl) {
+      console.log("Cargando foto:", envio.fotoUrl);
+      setFotoURL(envio.fotoUrl);
     } else {
       console.warn("No hay URL de foto");
     }
@@ -65,6 +65,7 @@ export default function ModalDetalleEnvio({ envio, abierto, onCerrar }) {
       <DialogTitle>Detalle del Envío {envio.numeroEnvio || ""}</DialogTitle>
       <DialogContent dividers>
         <Grid container spacing={2}>
+           <Campo label="Venta" valor={envio.fotoURL || '-'} />
           <Campo label="Venta" valor={envio.venta || '-'} />
           <Campo label="Estado" valor={envio.estado} />
           <Campo label="Destinatario" valor={envio.recieverName} />
