@@ -7,6 +7,7 @@ import {
   Container,
   Typography,
   Grid,
+  Button,
   Paper,
   Box,
   Divider,
@@ -18,6 +19,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import TablaEnviosCliente from "../components/material/TablaEnviosCliente";
 import TablaPagosCliente from "../components/material/TablaPagosClientes";
+import EditarClienteModal from "../components/material/EditarCliente";
 
 export default function VistaClienteById() {
   const { id } = useParams();
@@ -25,6 +27,7 @@ export default function VistaClienteById() {
   const [cliente, setCliente] = useState(null);
   const [envios, setEnvios] = useState([]);
   const [pagos, setPagos] = useState([]);
+  const [modalAbierto, setModalAbierto] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,6 +99,19 @@ export default function VistaClienteById() {
             </CardContent>
           </Card>
         </Grid>
+        <Grid item xs={6}>
+          <Card>
+            <CardContent sx={{ textAlign: "center" }}>
+               <Button 
+                size="small"
+    
+                onClick={() => setModalAbierto(true)}
+                >
+    Editar datos del cliente
+  </Button>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
 
       <Box mb={4}>
@@ -113,6 +129,14 @@ export default function VistaClienteById() {
         <Divider sx={{ mb: 2 }} />
         <TablaPagosCliente pagos={pagos} />
       </Box>
+      <EditarClienteModal
+  cliente={cliente}
+  open={modalAbierto}
+  onClose={() => setModalAbierto(false)}
+  onGuardado={() => {
+    // opcional: recargar datos del cliente
+  }}
+/>
     </Container>
   );
 }
