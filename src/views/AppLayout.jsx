@@ -29,14 +29,14 @@ import {
 const drawerWidth = 260;
 
 const menuItems = [
-  {
+/*   {
     label: "Envíos",
     icon: <LocalShipping />,
     children: [
       { label: "Crear envíos", path: "/admin/crear-multiples" },
       { label: "Ver envíos", path: "/admin/envios" },
     ],
-  },
+  }, */
   {
     label: "Clientes",
     icon: <People />,
@@ -53,14 +53,14 @@ const menuItems = [
       { label: "Registrar Pago C/C", path: "/admin/registrar-pago-cc" }
     ],
   },
-  {
+/*   {
     label: "Repartidores",
     icon: <TwoWheeler />,
     children: [
       { label: "Crear repartidor", path: "/admin/crear-repartidor" },
       { label: "Asignar envíos", path: "/admin/asignar-envios" },
     ],
-  },
+  }, */
 ];
 
 export default function AppLayout() {

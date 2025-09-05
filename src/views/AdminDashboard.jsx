@@ -21,7 +21,7 @@ import { Tab } from "@mui/material";
 import { getEnvios } from "../utils/getEnvios";
 import BotonAsignarRepartidorM from "../components/material/BotonAsignarRepartidor";
 import ModalEditarEnvio from "../components/material/ModalEditarEnvio";
-
+import { obtenerEnvios } from "../utils/backend";
 
 const categorias = [
   {
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
 
 
    const fetchData = async () => {
-        const data = await getEnvios();
+        const data = await obtenerEnvios()
         setEnvios(data);
       };
    useEffect(() => {

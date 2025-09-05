@@ -10,12 +10,13 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
-import { getDownloadURL, ref } from "firebase/storage";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import formatearFecha from "../../utils/formatearFecha";
 
+
 export default function ModalDetalleEnvio({ envio, abierto, onCerrar }) {
+  console.log("🚀 ~ ModalDetalleEnvio ~ envio:", envio)
   const [historial, setHistorial] = useState([]);
   const [fotoURL, setFotoURL] = useState(null);
   const [cargandoHistorial, setCargandoHistorial] = useState(false);

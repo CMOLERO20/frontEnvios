@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { doc, updateDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useSnackbar } from 'notistack';
+import { actualizarEnvio } from "../../api/crudEnvios";
 
 export default function ModalEditarEnvio({ envio, open, onClose, onUpdate }) {
   const { enqueueSnackbar } = useSnackbar();

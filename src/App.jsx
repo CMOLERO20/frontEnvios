@@ -27,6 +27,7 @@ import { auth } from "./firebase";
 import ConfirmarPagosTransferencia from "./components/material/ConfirmarPagosTransferencia";
 import RegistrarPagoCuentaCorriente from "./components/material/RegistrarPagoCuentaCorriente";
 import VistaCuentasCorrientes from "./views/VistaCuentasCorrientes";
+import RegistrosPage from "./views/RegistrosPage";
 
 export default function App() {
   return (
@@ -46,7 +47,7 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<AdminDashboard />} />
+            <Route index element={<RegistrosPage />} />
             <Route path="crear-multiples" element={<CrearEnviosMultiplesM />} />
             <Route path="crear-envios-ocr" element={<CrearEnviosOCR />} />
             <Route path="crear-envios-ocr-v2" element={<CrearEnviosOCRV2 />} />
@@ -60,6 +61,7 @@ export default function App() {
              <Route path="asignar-envios" element={<AsignarRepartidor />} />
               <Route path="confirmar-transferencia" element={<ConfirmarPagosTransferencia />} />
                <Route path="registrar-pago-cc" element={<VistaCuentasCorrientes />} />
+                <Route path="registros" element={<RegistrosPage />} />
           </Route>
 
           {/* Clientes */}

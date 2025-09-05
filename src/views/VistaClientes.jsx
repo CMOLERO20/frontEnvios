@@ -13,7 +13,6 @@ import {
   Paper,
 } from "@mui/material";
 import { getClients } from "../utils/getClients";
-
 export default function VistaClientes() {
   const [clientes, setClientes] = useState([]);
   const [filtro, setFiltro] = useState("");

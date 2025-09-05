@@ -89,14 +89,19 @@ const [envioAEditar, setEnvioAEditar] = useState(null);
 
   const paginados = filtrados.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  const formatFecha = (timestamp) => {
-    try {
-      return timestamp?.toDate
-        ? new Intl.DateTimeFormat('es-AR').format(timestamp.toDate())
-        : '-';
-    } catch {
-      return '-';
-    }
+  const formatFecha = (fechaISO) => {
+    if (!fechaISO) return "—";
+
+  const fecha = new Date(fechaISO);
+
+  return fecha.toLocaleString("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
   };
 
 // Dentro del componente

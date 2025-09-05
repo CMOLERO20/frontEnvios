@@ -126,7 +126,7 @@ export default function TablaPagosCliente({ pagos }) {
                   <TableCell>{pago.clienteNombre}</TableCell>
                   <TableCell>{pago.metodo}</TableCell>
                   <TableCell>${pago.monto.toLocaleString("es-AR")}</TableCell>
-                   <TableCell>{pago.envios?.length || 0}</TableCell>
+                   <TableCell>{pago.envios?.length || pago.cantidadEnvios}</TableCell>
                   <TableCell>{pago.estado}</TableCell>
                   <TableCell>
                     {pago.creado?.toDate

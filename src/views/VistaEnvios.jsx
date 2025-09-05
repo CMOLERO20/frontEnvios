@@ -7,6 +7,7 @@ import BotonVolver from "../components/elementos/BotonVolver";
 import TablaAdmin from "../components/material/TablaAdmin";
 import ModalGenerico from "../components/elementos/ModalGenerico";
 import { getEnvios } from "../utils/getEnvios";
+import { obtenerEnvios } from "../api/crudEnvios";
 
 export default function VistaEnvios() {
   const [envios, setEnvios] = useState([]);
@@ -19,7 +20,7 @@ export default function VistaEnvios() {
 
   
  const fetchData = async () => {
-         const data = await getEnvios();
+         const data = await obtenerEnvios();
          setEnvios(data);
        };
     useEffect(() => {
