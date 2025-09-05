@@ -106,10 +106,10 @@ export default function RegistrosDelDia() {
       </Toolbar>
 
       <Box sx={{ px: 2, pb: 1 }}>
-        <Typography variant="body2" sx={{ mb: 1 }}>
+        <Typography variant="body4" sx={{ mb: 1 }}>
           <b>Totales del día:</b>{" "}
-          CABA {totales.CABA} | Z1 {totales.Z1} | Z2 {totales.Z2} | Z3 {totales.Z3} —{" "}
-          <b>Total:</b> {currency.format(totales.monto)}
+          CABA <b>{totales.CABA}</b> | Z1 <b>{totales.Z1}</b> | Z2 <b>{totales.Z2}</b> | Z3 <b>{totales.Z3}</b> 
+          
         </Typography>
         {errorMsg && (
           <Typography variant="caption" color="error">

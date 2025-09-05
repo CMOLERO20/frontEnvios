@@ -37,6 +37,14 @@ const menuItems = [
       { label: "Ver envíos", path: "/admin/envios" },
     ],
   }, */
+   {
+    label: "Registro",
+    icon: <LocalShipping />,
+    children: [
+      { label: "Registrar Envios", path: "/admin/registros" },
+     
+    ],
+  },
   {
     label: "Clientes",
     icon: <People />,
