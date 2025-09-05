@@ -128,8 +128,9 @@ export default function RegistrosDelDia() {
               <TableCell align="right">Z1</TableCell>
               <TableCell align="right">Z2</TableCell>
               <TableCell align="right">Z3</TableCell>
-              <TableCell>Método</TableCell>
               <TableCell align="right">Monto</TableCell>
+              <TableCell>Método</TableCell>
+              
               <TableCell>Notas</TableCell>
               <TableCell align="center">Acciones</TableCell>
             </TableRow>
@@ -143,8 +144,9 @@ export default function RegistrosDelDia() {
                 <TableCell align="right">{r.cantidades?.Z1 || 0}</TableCell>
                 <TableCell align="right">{r.cantidades?.Z2 || 0}</TableCell>
                 <TableCell align="right">{r.cantidades?.Z3 || 0}</TableCell>
+                 <TableCell align="right">{currency.format(Number(r.montoTotal || 0))}</TableCell>
                 <TableCell>{r.metodoPago}</TableCell>
-                <TableCell align="right">{currency.format(Number(r.montoTotal || 0))}</TableCell>
+               
                 <TableCell>{r.notas || ""}</TableCell>
                 <TableCell align="center">
                   <Tooltip title="Eliminar registro y pago">
