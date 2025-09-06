@@ -5,6 +5,7 @@ import { getClients } from "../../utils/getClients";
 import { registrarPago } from "../../utils/RegistroPagoSimple.jsx"; // <-- ajustá ruta si hace falta
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
+import { useSnackbar } from "notistack";
 
 // Precios por zona
 const PRECIOS = { CABA: 3800, Z1: 6000, Z2: 7900, Z3: 8900 };
@@ -17,7 +18,7 @@ export default function RegistroEnviosForm({ user }) {
   const [clienteSel, setClienteSel] = useState(null);
   const [clienteId, setClienteId] = useState("");
   const [clienteNombre, setClienteNombre] = useState("");
-
+    const { enqueueSnackbar } = useSnackbar();
   // Datos del registro
   const [cant, setCant] = useState({ CABA: 0, Z1: 0, Z2: 0, Z3: 0 });
   const [metodoPago, setMetodoPago] = useState("efectivo"); // solo "efectivo" o "transferencia"
@@ -98,7 +99,13 @@ export default function RegistroEnviosForm({ user }) {
         metodo: metodoPago, // solo "efectivo" o "transferencia"
         monto: montoTotal,
         creadoPor: user?.uid || "admin",
-        cantidadEnvios: totalEnvios
+        cantidadEnvios: totalEnvios,
+         cantidades: {
+          CABA: +cant.CABA || 0,
+          Z1: +cant.Z1 || 0,
+          Z2: +cant.Z2 || 0,
+          Z3: +cant.Z3 || 0,
+        },
       });
 
       // 3) Vincular pagoId al registro
@@ -107,7 +114,7 @@ export default function RegistroEnviosForm({ user }) {
       // limpiar mínimos (dejamos cliente seleccionado por comodidad)
       setCant({ CABA: 0, Z1: 0, Z2: 0, Z3: 0 });
       setNotas("");
-      alert("Registro y pago creados correctamente ✅");
+     enqueueSnackbar("Cliente creado correctamente", { variant: "success" });
     } catch (err) {
       console.error(err);
       alert("Ocurrió un error al guardar el registro y/o el pago.");
@@ -119,7 +126,7 @@ export default function RegistroEnviosForm({ user }) {
   return (
     <Paper sx={{ p: 2, mb: 3 }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
-        Registro de envíos diarios
+        Registro de envíos 
       </Typography>
 
       <form onSubmit={handleSubmit}>
@@ -137,7 +144,7 @@ export default function RegistroEnviosForm({ user }) {
           <Grid item xs={6} />
 
           {/* AUTOCOMPLETE DE CLIENTES */}
-          <Grid item xs={12}>
+          <Grid size={{ xs:10, sm:3 }}>
             <Autocomplete
               options={usuariosOrdenados}
               value={clienteSel}
@@ -188,7 +195,7 @@ export default function RegistroEnviosForm({ user }) {
           <Grid size={{ xs: 10, sm:1.5 }}>
             <TextField label="Monto total" fullWidth value={montoTotal} InputProps={{ readOnly: true }} />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs:12, sm:3 }}>
             <TextField
               label="Método de pago"
               select
@@ -204,24 +211,24 @@ export default function RegistroEnviosForm({ user }) {
             </TextField>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 4, sm:4 }}>
             <TextField
               label="Notas"
               fullWidth
               multiline
-              minRows={2}
+              minRows={1}
               value={notas}
               onChange={(e) => setNotas(e.target.value)}
             />
           </Grid>
 
-          <Grid item xs={12}>
-            <Typography variant="body2">
+          <Grid size={{ xs: 3, sm:2 }}>
+            <Typography variant="h6">
               Total envíos: <b>{totalEnvios}</b>
             </Typography>
           </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" disabled={loading || !clienteId || totalEnvios <= 0}>
+          <Grid size={{ xs: 3, sm:3 } }>
+            <Button size="large" type="submit" variant="contained" disabled={loading || !clienteId || totalEnvios <= 0}>
               {loading ? "Guardando..." : "Guardar registro"}
             </Button>
           </Grid>

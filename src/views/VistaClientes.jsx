@@ -71,7 +71,7 @@ export default function VistaClientes() {
               <TableCell>Nombre</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Teléfono</TableCell>
-              <TableCell>Cuenta Corriente</TableCell>
+          
             </TableRow>
           </TableHead>
           <TableBody>
@@ -85,7 +85,7 @@ export default function VistaClientes() {
                 <TableCell>{cliente.nombre || "-"}</TableCell>
                 <TableCell>{cliente.email}</TableCell>
                 <TableCell>{cliente.telefono || "-"}</TableCell>
-                <TableCell>{cliente.cuentaCorriente}</TableCell>
+             
               </TableRow>
             ))}
           </TableBody>

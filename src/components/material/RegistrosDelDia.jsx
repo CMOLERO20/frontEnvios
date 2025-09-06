@@ -19,22 +19,28 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Stack,
+  Chip,
+  Divider,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { subscribeRegistrosPorDia, startOfDayTS } from "../../utils/registros.jsx";
+import { subscribeRegistrosPorDia } from "../../utils/registros.jsx";
 import { eliminarRegistroYPagoById } from "../../utils/registros.jsx";
 
-const currency = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const currency = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  maximumFractionDigits: 0,
+});
 
 export default function RegistrosDelDia() {
   const [fecha, setFecha] = useState(() => new Date().toISOString().slice(0, 10));
-  const [clienteId] = useState(""); // si luego querés filtro por cliente, enchufamos un Autocomplete
+  const [clienteId] = useState("");
   const [items, setItems] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // estado para eliminar
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [target, setTarget] = useState(null); // { id, clienteNombre, montoTotal, ... }
+  const [target, setTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -65,25 +71,23 @@ export default function RegistrosDelDia() {
     [items]
   );
 
+  const totalEnvios = totales.CABA + totales.Z1 + totales.Z2 + totales.Z3;
+
   const handleAskDelete = (row) => {
     setTarget(row);
     setOpenConfirm(true);
   };
-
   const handleCloseConfirm = () => {
     if (deleting) return;
     setOpenConfirm(false);
     setTarget(null);
   };
-
   const handleDelete = async () => {
     if (!target?.id) return;
     setDeleting(true);
     try {
       await eliminarRegistroYPagoById(target.id);
-      // no hace falta manual refresh: la suscripción onSnapshot actualiza la tabla
       handleCloseConfirm();
-      setDeleting(false);
     } catch (e) {
       console.error(e);
       setErrorMsg(e?.message || "No se pudo eliminar el registro.");
@@ -93,8 +97,11 @@ export default function RegistrosDelDia() {
 
   return (
     <Paper sx={{ p: 0 }}>
+      {/* Header */}
       <Toolbar sx={{ gap: 2, flexWrap: "wrap" }}>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>Registros del día</Typography>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          Registros del día
+        </Typography>
         <TextField
           type="date"
           label="Fecha"
@@ -105,12 +112,19 @@ export default function RegistrosDelDia() {
         />
       </Toolbar>
 
+      {/* Totales (chips con colores + total de envíos a la derecha) */}
       <Box sx={{ px: 2, pb: 1 }}>
-        <Typography variant="body4" sx={{ mb: 1 }}>
-          <b>Totales del día:</b>{" "}
-          CABA <b>{totales.CABA}</b> | Z1 <b>{totales.Z1}</b> | Z2 <b>{totales.Z2}</b> | Z3 <b>{totales.Z3}</b> 
-          
-        </Typography>
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center" sx={{ mb: 1 }}>
+          <Typography variant="subtitle2" sx={{ mr: 1 }}>
+            Totales del día:
+          </Typography>
+          <Chip label={`CABA ${totales.CABA}`} color="primary" variant="filled" />
+          <Chip label={`Z1 ${totales.Z1}`} color="success" variant="filled" />
+          <Chip label={`Z2 ${totales.Z2}`} color="warning" variant="filled" />
+          <Chip label={`Z3 ${totales.Z3}`} color="error" variant="filled" />
+          <Divider flexItem orientation="vertical" sx={{ mx: 1 }} />
+          <Chip label={`Total envíos ${totalEnvios}`} color="secondary" variant="filled" />
+        </Stack>
         {errorMsg && (
           <Typography variant="caption" color="error">
             {errorMsg}
@@ -118,23 +132,46 @@ export default function RegistrosDelDia() {
         )}
       </Box>
 
-      <TableContainer>
-        <Table size="small" aria-label="registros del día">
-          <TableHead>
+      {/* Tabla con header sticky y scroll interno */}
+      <TableContainer
+        sx={{
+          height: 420,          // alto fijo del contenedor
+          overflow: "auto",     // scroll
+          borderTop: 1,
+          borderColor: "divider",
+        }}
+      >
+        <Table size="small" stickyHeader sx={{ minWidth: 900 }}>
+          <TableHead
+            sx={{
+              "& th": { fontWeight: 600, bgcolor: "grey.50" },
+            }}
+          >
+            {/* Fila 1: encabezado agrupado */}
             <TableRow>
-              <TableCell>Hora</TableCell>
-              <TableCell>Cliente</TableCell>
+              <TableCell rowSpan={2}>Hora</TableCell>
+              <TableCell rowSpan={2}>Cliente</TableCell>
+              <TableCell align="center" colSpan={4}>
+                Zonas
+              </TableCell>
+              <TableCell rowSpan={2}>Método</TableCell>
+              <TableCell rowSpan={2} align="right">
+                Monto
+              </TableCell>
+              <TableCell rowSpan={2}>Notas</TableCell>
+              <TableCell rowSpan={2} align="center">
+                Acciones
+              </TableCell>
+            </TableRow>
+            {/* Fila 2: columnas por zona */}
+            <TableRow>
               <TableCell align="right">CABA</TableCell>
               <TableCell align="right">Z1</TableCell>
               <TableCell align="right">Z2</TableCell>
               <TableCell align="right">Z3</TableCell>
-              <TableCell align="right">Monto</TableCell>
-              <TableCell>Método</TableCell>
-              
-              <TableCell>Notas</TableCell>
-              <TableCell align="center">Acciones</TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
             {items.map((r) => (
               <TableRow key={r.id} hover>
@@ -144,18 +181,13 @@ export default function RegistrosDelDia() {
                 <TableCell align="right">{r.cantidades?.Z1 || 0}</TableCell>
                 <TableCell align="right">{r.cantidades?.Z2 || 0}</TableCell>
                 <TableCell align="right">{r.cantidades?.Z3 || 0}</TableCell>
-                 <TableCell align="right">{currency.format(Number(r.montoTotal || 0))}</TableCell>
                 <TableCell>{r.metodoPago}</TableCell>
-               
+                <TableCell align="right">{currency.format(Number(r.montoTotal || 0))}</TableCell>
                 <TableCell>{r.notas || ""}</TableCell>
                 <TableCell align="center">
                   <Tooltip title="Eliminar registro y pago">
                     <span>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleAskDelete(r)}
-                        size="small"
-                      >
+                      <IconButton color="error" onClick={() => handleAskDelete(r)} size="small">
                         <DeleteOutlineIcon />
                       </IconButton>
                     </span>
@@ -175,12 +207,13 @@ export default function RegistrosDelDia() {
         </Table>
       </TableContainer>
 
-      {/* Diálogo de confirmación */}
+      {/* Confirmación eliminar */}
       <Dialog open={openConfirm} onClose={handleCloseConfirm} fullWidth maxWidth="xs">
         <DialogTitle>Eliminar registro</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            ¿Seguro que querés eliminar este registro{target?.clienteNombre ? ` de ${target.clienteNombre}` : ""}?
+            ¿Seguro que querés eliminar este registro
+            {target?.clienteNombre ? ` de ${target.clienteNombre}` : ""}?
             {target?.montoTotal ? ` Se eliminará también el pago por ${currency.format(target.montoTotal)}.` : ""}
           </DialogContentText>
         </DialogContent>

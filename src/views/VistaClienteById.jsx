@@ -45,8 +45,7 @@ export default function VistaClienteById() {
   }, [id]);
 
   const totalEnvios = envios.length;
-  const demorados = envios.filter((e) => e.estado === "Demorado").length;
-  const porcentajeDemorados = totalEnvios ? Math.round((demorados / totalEnvios) * 100) : 0;
+
 
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
@@ -75,30 +74,7 @@ export default function VistaClienteById() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={6}>
-          <Card>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="body2" color="text.secondary">
-                % de Demorados
-              </Typography>
-              <Typography variant="h6" color="warning.main" fontWeight="bold">
-                {porcentajeDemorados}%
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12}>
-          <Card>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="body2" color="text.secondary">
-                Estado de Cuenta Corriente
-              </Typography>
-              <Typography variant="h6" color="primary" fontWeight="bold">
-                ${cliente?.cuentaCorriente?.toLocaleString("es-AR") || 0}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+      
         <Grid item xs={6}>
           <Card>
             <CardContent sx={{ textAlign: "center" }}>
@@ -114,17 +90,17 @@ export default function VistaClienteById() {
         </Grid>
       </Grid>
 
-      <Box mb={4}>
+    {/*   <Box mb={4}>
         <Typography variant="h6" gutterBottom>
           📦 Envíos
         </Typography>
         <Divider sx={{ mb: 2 }} />
         <TablaEnviosCliente envios={envios} />
       </Box>
-
+ */}
       <Box>
         <Typography variant="h6" gutterBottom>
-          💰 Pagos
+          💰 Movimientos
         </Typography>
         <Divider sx={{ mb: 2 }} />
         <TablaPagosCliente pagos={pagos} />

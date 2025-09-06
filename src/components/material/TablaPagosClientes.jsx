@@ -110,12 +110,14 @@ export default function TablaPagosCliente({ pagos }) {
         <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>
+               <TableCell>Fecha</TableCell>
               <TableCell>Cliente</TableCell>
-              <TableCell>Método</TableCell>
+              
               <TableCell>Monto</TableCell>
               <TableCell>Envíos</TableCell>
+              <TableCell>Método</TableCell>
               <TableCell>Estado</TableCell>
-              <TableCell>Fecha</TableCell>
+             
             </TableRow>
           </TableHead>
           <TableBody>
@@ -123,16 +125,18 @@ export default function TablaPagosCliente({ pagos }) {
               .slice(pagina * pagosPorPagina, pagina * pagosPorPagina + pagosPorPagina)
               .map((pago) => (
                 <TableRow key={pago.id}>
-                  <TableCell>{pago.clienteNombre}</TableCell>
-                  <TableCell>{pago.metodo}</TableCell>
-                  <TableCell>${pago.monto.toLocaleString("es-AR")}</TableCell>
-                   <TableCell>{pago.envios?.length || pago.cantidadEnvios}</TableCell>
-                  <TableCell>{pago.estado}</TableCell>
-                  <TableCell>
+                   <TableCell>
                     {pago.creado?.toDate
                       ? dayjs(pago.creado.toDate()).format("DD/MM/YYYY")
                       : "-"}
                   </TableCell>
+                  <TableCell>{pago.clienteNombre}</TableCell>
+                 
+                  <TableCell>${pago.monto.toLocaleString("es-AR")}</TableCell>
+                   <TableCell>{pago.envios?.length || pago.cantidadEnvios}</TableCell>
+                  <TableCell>{pago.metodo}</TableCell>
+                  <TableCell>{pago.estado}</TableCell>
+                 
                 </TableRow>
               ))}
           </TableBody>

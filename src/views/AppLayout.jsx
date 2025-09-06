@@ -58,7 +58,7 @@ const menuItems = [
     icon: <Payments />,
     children: [{ label: "Ver pagos", path: "/admin/pagos" },
       { label: "Confirmar transferencias", path: "/admin/confirmar-transferencia" },
-      { label: "Registrar Pago C/C", path: "/admin/registrar-pago-cc" }
+      /* { label: "Registrar Pago C/C", path: "/admin/registrar-pago-cc" } */
     ],
   },
 /*   {
