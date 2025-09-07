@@ -7,7 +7,8 @@ export async function registrarPago({
   metodo, // "transferencia" | "cuenta_corriente" | "efectivo"
   monto,
   creadoPor = "cliente",
-  cantidadEnvios
+  cantidadEnvios,
+  cantidades
 }) {
   if (!clienteId || !metodo || !monto) {
     throw new Error("Faltan datos obligatorios para registrar el pago.");
@@ -22,6 +23,8 @@ export async function registrarPago({
     estado: metodo === "efectivo" ? "confirmado" : "pendiente",
     creado: Timestamp.now(),
     cantidadEnvios,
+    cantidades
+    
   };
 
   try {

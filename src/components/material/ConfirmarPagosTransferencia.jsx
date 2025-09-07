@@ -7,27 +7,37 @@ import {
   Toolbar, Stack, TextField, Autocomplete, CircularProgress
 } from "@mui/material";
 import {
-  collection, getDocs, updateDoc, doc, query, where,
-  Timestamp, serverTimestamp
+  collection, getDocs, updateDoc, doc, query, where, serverTimestamp
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import dayjs from "dayjs";
 import { useSnackbar } from "notistack";
 import { getClients } from "../../utils/getClients";
 
-// helper fechas -> Timestamp
-const startOfDayTS = (isoDateStr) => {
+const currencyAR = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  maximumFractionDigits: 0
+});
+
+// helpers de fecha (milisegundos)
+const startOfDayMs = (isoDateStr) => {
   const d = new Date(isoDateStr);
   d.setHours(0, 0, 0, 0);
-  return Timestamp.fromDate(d);
+  return d.getTime();
 };
-const endOfDayNextTS = (isoDateStr) => {
+const endOfDayNextMs = (isoDateStr) => {
   const d = new Date(isoDateStr);
   d.setHours(24, 0, 0, 0); // día siguiente 00:00
-  return Timestamp.fromDate(d);
+  return d.getTime();
 };
-
-const currencyAR = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const getCreatedMillis = (p) => {
+  if (p?.creado?.toMillis) return p.creado.toMillis();
+  if (p?.fecha?.toMillis) return p.fecha.toMillis();
+  if (p?.creado instanceof Date) return p.creado.getTime();
+  if (typeof p?.creado === "string" || typeof p?.creado === "number") return new Date(p.creado).getTime();
+  return 0;
+};
 
 export default function ConfirmarPagosTransferencia() {
   const [pagos, setPagos] = useState([]);
@@ -41,7 +51,6 @@ export default function ConfirmarPagosTransferencia() {
   const [desde, setDesde] = useState(() => new Date().toISOString().slice(0, 10));
   const [hasta, setHasta] = useState(() => new Date().toISOString().slice(0, 10));
   const [loadingClientes, setLoadingClientes] = useState(false);
-  const [indexUrl, setIndexUrl] = useState("");
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -65,42 +74,44 @@ export default function ConfirmarPagosTransferencia() {
     [clientes]
   );
 
+  // === SIN ÍNDICES: sólo filtro por metodo en Firestore y el resto en memoria ===
   const fetchPagos = async () => {
     setLoading(true);
-    setIndexUrl("");
     try {
-      const clauses = [
-        where("metodo", "==", "transferencia"),
-        where("estado", "==", "pendiente"),
-      ];
-      if (clienteId) clauses.push(where("clienteId", "==", clienteId));
-      if (desde) clauses.push(where("creado", ">=", startOfDayTS(desde)));
-      if (hasta) clauses.push(where("creado", "<", endOfDayNextTS(hasta)));
+      // 1) Traigo únicamente pagos por transferencia (índice simple; no requiere compuesto)
+      const baseQ = query(collection(db, "pagos"), where("metodo", "==", "transferencia"));
+      const snap = await getDocs(baseQ);
+      const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-      const q = query(collection(db, "pagos"), ...clauses);
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      // 2) Filtro en memoria: estado, cliente, rango de fechas
+      const desdeMs = desde ? startOfDayMs(desde) : -Infinity;
+      const hastaMs = hasta ? endOfDayNextMs(hasta) : Infinity;
 
-      // ordenamos por creado desc en memoria (por si no usamos orderBy para evitar nuevos índices)
-      data.sort((a, b) => (b.creado?.toMillis?.() || 0) - (a.creado?.toMillis?.() || 0));
+      const data = all
+        .filter((p) => {
+          const estado = String(p.estado || "").toLowerCase();
+          if (estado !== "pendiente") return false;
+
+          if (clienteId && p.clienteId !== clienteId) return false;
+
+          const t = getCreatedMillis(p);
+          if (t < desdeMs || t >= hastaMs) return false;
+
+          return true;
+        })
+        // 3) Orden por fecha desc en memoria
+        .sort((a, b) => getCreatedMillis(b) - getCreatedMillis(a));
 
       setPagos(data);
     } catch (e) {
       console.error(e);
-      // Si falta índice, Firestore devuelve failed-precondition con un link para crearlo
-      if (e.code === "failed-precondition") {
-        const m = String(e.message || "").match(/https:\/\/[^\s)]+/);
-        if (m?.[0]) setIndexUrl(m[0]);
-        enqueueSnackbar("Esta búsqueda requiere crear un índice en Firestore.", { variant: "warning" });
-      } else {
-        enqueueSnackbar("No se pudieron cargar los pagos.", { variant: "error" });
-      }
+      enqueueSnackbar("No se pudieron cargar los pagos.", { variant: "error" });
     } finally {
       setLoading(false);
     }
   };
 
-  // traer pagos cuando cambian filtros
+  // traer pagos cuando cambian filtros principales
   useEffect(() => {
     fetchPagos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,8 +122,8 @@ export default function ConfirmarPagosTransferencia() {
 
     try {
       await updateDoc(doc(db, "pagos", pagoSeleccionado.id), {
-        estado: "confirmado",            // usar minúsculas para mantener consistencia
-        confirmadoEn: serverTimestamp(), // marca de tiempo de confirmación
+        estado: "confirmado",
+        confirmadoEn: serverTimestamp(),
       });
       enqueueSnackbar("Pago confirmado correctamente ✅", { variant: "success" });
       setPagoSeleccionado(null);
@@ -169,12 +180,15 @@ export default function ConfirmarPagosTransferencia() {
             />
           )}
           renderOption={(props, option) => {
-            const { key, ...liProps } = props; // evita warning por key en spread
+            // evitar warning por key dentro de spread
+            const { key, ...liProps } = props;
             return (
               <li key={key} {...liProps}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <span><b>{option.nombre}</b></span>
-                  <small style={{ opacity: 0.7 }}>{option.email || `UID: ${option.uid || option.id}`}</small>
+                  <small style={{ opacity: 0.7 }}>
+                    {option.email || `UID: ${option.uid || option.id}`}
+                  </small>
                 </div>
               </li>
             );
@@ -207,13 +221,6 @@ export default function ConfirmarPagosTransferencia() {
           </Button>
         </Stack>
       </Toolbar>
-
-      {indexUrl && (
-        <Typography variant="caption" color="warning.main" sx={{ display: "block", mt: 1 }}>
-          Falta un índice para esta consulta.{" "}
-          <a href={indexUrl} target="_blank" rel="noreferrer">Crear índice en Firebase</a>
-        </Typography>
-      )}
 
       <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 480 }}>
         <Table size="small" stickyHeader>
