@@ -224,7 +224,7 @@ const [modalAbierto, setModalAbierto] = useState(false);
       <ModalFotosRegistro
   open={modalAbierto}
   onClose={() => setModalAbierto(false)}
-  imagenes={registroSeleccionado?.imagenes || []}
+  imagenes={registroSeleccionado?.fotos || []}
 />
 
       {/* Confirmación eliminar */}

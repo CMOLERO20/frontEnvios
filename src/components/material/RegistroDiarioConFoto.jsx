@@ -126,7 +126,7 @@ export default function RegistroDiarioConFotos({ user }) {
         }
 
         // 2) Nombre y ref
-        const nombreArchivo = `registros_diarios/${registroId}/etiquetas/${uuidv4()}.jpg`;
+        const nombreArchivo = `registros_diarios/${uuidv4()}.jpg`;
         const storageRef = ref(storage, nombreArchivo);
 
         // 3) Subida
