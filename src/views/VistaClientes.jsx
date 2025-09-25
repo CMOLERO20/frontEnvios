@@ -10,6 +10,11 @@ import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 
 import { getClients } from "../utils/clientes.jsx"; // usa tu util
+import { migrarUsuariosAClientes } from "../utils/migrar.jsx";
+
+
+
+
 function avatarColor(seed = "") {
   // colorcito estable por nombre
   const colors = ["#7e57c2","#42a5f5","#26a69a","#ef5350","#ab47bc","#29b6f6","#66bb6a","#ffa726","#8d6e63"];
@@ -43,6 +48,22 @@ export default function ClientesAdmin() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const [loading2, setLoading2] = useState(false);
+  const [resultado, setResultado] = useState(null);
+
+  const handleMigrar = async () => {
+    setLoading2(true);
+    setResultado(null);
+    try {
+      const cantidad = await migrarUsuariosAClientes();
+      setResultado(`✅ Se migraron ${cantidad} usuarios a la colección clientes.`);
+    } catch (error) {
+      console.error("Error migrando usuarios:", error);
+      setResultado("❌ Hubo un error durante la migración.");
+    } finally {
+      setLoading(false);
+    }
+  };
   // carga inicial
   const fetchData = async () => {
     setLoading(true);
@@ -107,6 +128,19 @@ export default function ClientesAdmin() {
         <Typography variant="h5" fontWeight="bold" sx={{ mr: 1 }}>
           👥 Clientes
         </Typography>
+
+
+<div className="p-4">
+      <button
+        onClick={handleMigrar}
+        disabled={loading2}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        {loading2 ? "Migrando..." : "Migrar usuarios a clientes"}
+      </button>
+      {resultado && <p className="mt-3 text-sm">{resultado}</p>}
+    </div>
+
 
         <Chip
           size="small"
