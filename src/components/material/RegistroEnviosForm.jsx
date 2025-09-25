@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { TextField, MenuItem, Button, Grid, Paper, Typography, Autocomplete } from "@mui/material";
 import { crearRegistroDiario } from "../../utils/registros.jsx";
-import { getClients } from "../../utils/getClients";
+import { getClients } from "../../utils/clientes.jsx";
 import { registrarPago } from "../../utils/RegistroPagoSimple.jsx"; // <-- ajustá ruta si hace falta
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";

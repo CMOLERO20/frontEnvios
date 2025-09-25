@@ -12,7 +12,7 @@ import {
 import { db } from "../../firebase";
 import dayjs from "dayjs";
 import { useSnackbar } from "notistack";
-import { getClients } from "../../utils/getClients";
+import { getClients } from "../../utils/clientes";
 
 const currencyAR = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -74,42 +74,54 @@ export default function ConfirmarPagosTransferencia() {
     [clientes]
   );
 
-  // === SIN ÍNDICES: sólo filtro por metodo en Firestore y el resto en memoria ===
-  const fetchPagos = async () => {
-    setLoading(true);
-    try {
-      // 1) Traigo únicamente pagos por transferencia (índice simple; no requiere compuesto)
-      const baseQ = query(collection(db, "pagos"), where("metodo", "==", "transferencia"));
-      const snap = await getDocs(baseQ);
-      const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+// helpers (usa horario local)
+const startOfDayMs = (iso) => dayjs(iso, "YYYY-MM-DD").startOf("day").valueOf();
+const endOfDayMs   = (iso) => dayjs(iso, "YYYY-MM-DD").endOf("day").valueOf();
 
-      // 2) Filtro en memoria: estado, cliente, rango de fechas
-      const desdeMs = desde ? startOfDayMs(desde) : -Infinity;
-      const hastaMs = hasta ? endOfDayNextMs(hasta) : Infinity;
+const getCreatedMillis = (p) => {
+  if (p.creado?.toMillis) return p.creado.toMillis();                // Firestore Timestamp
+  if (p.creado?.toDate)  return p.creado.toDate().getTime();         // Firestore Timestamp (alt)
+  if (typeof p.creado === "number") return p.creado;                 // ya son ms
+  if (typeof p.creado === "string") return dayjs(p.creado).valueOf();// ISO/string
+  return 0;
+};
 
-      const data = all
-        .filter((p) => {
-          const estado = String(p.estado || "").toLowerCase();
-          if (estado !== "pendiente") return false;
+// === SIN ÍNDICES: filtro método en Firestore y resto en memoria ===
+const fetchPagos = async () => {
+  setLoading(true);
+  try {
+    const baseQ = query(collection(db, "pagos"), where("metodo", "==", "transferencia"));
+    const snap = await getDocs(baseQ);
+    const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-          if (clienteId && p.clienteId !== clienteId) return false;
+    const desdeMs = desde ? startOfDayMs(desde) : -Infinity;
+    const hastaMs = hasta ? endOfDayMs(hasta)   :  Infinity;  // INCLUSIVO
 
-          const t = getCreatedMillis(p);
-          if (t < desdeMs || t >= hastaMs) return false;
+    const data = all
+      .filter((p) => {
+        // estado pendiente
+        if (String(p.estado || "").toLowerCase() !== "pendiente") return false;
 
-          return true;
-        })
-        // 3) Orden por fecha desc en memoria
-        .sort((a, b) => getCreatedMillis(b) - getCreatedMillis(a));
+        // cliente (si hay)
+        if (clienteId && p.clienteId !== clienteId) return false;
 
-      setPagos(data);
-    } catch (e) {
-      console.error(e);
-      enqueueSnackbar("No se pudieron cargar los pagos.", { variant: "error" });
-    } finally {
-      setLoading(false);
-    }
-  };
+        // rango de fechas
+        const t = getCreatedMillis(p);
+        if (t < desdeMs || t > hastaMs) return false; // <= fin de día
+
+        return true;
+      })
+      .sort((a, b) => getCreatedMillis(b) - getCreatedMillis(a)); // más reciente primero
+
+    setPagos(data);
+  } catch (e) {
+    console.error(e);
+    enqueueSnackbar("No se pudieron cargar los pagos.", { variant: "error" });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // traer pagos cuando cambian filtros principales
   useEffect(() => {

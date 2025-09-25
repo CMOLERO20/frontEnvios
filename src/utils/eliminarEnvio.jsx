@@ -1,8 +1,6 @@
 import { doc, deleteDoc, getDoc, addDoc, collection, updateDoc, increment} from 'firebase/firestore';
 import { db } from '../firebase';
-import registrarHistorialEnvio from './registrarHistorialEnvio';
-import { getPagoById } from './getPagos';
-import { registrarActivoCuentaCorriente } from './registrarActivoCuentaCorriente';
+
 
 export async function eliminarEnvio(envioId) {
   const envioRef = doc(db, 'envios', envioId);

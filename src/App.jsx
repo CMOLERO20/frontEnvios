@@ -6,61 +6,70 @@ import Register from "./auth/Register";
 import Login from "./auth/Login";
 import ProtectedRoute from "./auth/ProtectedRoute";
 
-import AdminDashboard from "./views/AdminDashboard";
-import MotoDashboard from "./views/MotoDashboard";
-import UserEnvios from "./views/UserEnvios";
-import MotoFinalizados from "./views/MotoFinalizados";
+
 import CrearCliente from "./views/CrearCliente";
 
-import CrearEnviosOCR from "./views/CrearEnviosOCR";
-import CrearEnviosOCRV2 from "./views/CrearEnviosOCRV2";
+
 import CrearEnviosMultiplesM from "./components/material/CrearEnviosMultiplesM";
 import VistaEnvios from "./views/VistaEnvios";
 import VistaClienteById from "./views/VistaClienteById";
 import VistaClientes from "./views/VistaClientes";
 import VistaPagos from "./views/VistaPagos";
 import TablaAdmin from "./components/material/TablaAdmin";
-import CrearRepartidor from "./views/CrearRepartidor";
-import AsignarRepartidor from "./views/AsignarRepartidor";
-import AppLayout from "./views/AppLayout";
-import { auth } from "./firebase";
-import ConfirmarPagosTransferencia from "./components/material/ConfirmarPagosTransferencia";
-import RegistrarPagoCuentaCorriente from "./components/material/RegistrarPagoCuentaCorriente";
-import VistaCuentasCorrientes from "./views/VistaCuentasCorrientes";
-import RegistrosPage from "./views/RegistrosPage";
 
+import AsignarRepartidor from "./views/AsignarRepartidor";
+
+
+import ConfirmarPagosTransferencia from "./components/material/ConfirmarPagosTransferencia";
+
+
+import RegistrosPage from "./views/RegistrosPage";
+import UsuariosAdmin from "./views/UsuariosAdmin";
+import CrearEnvioManual from "./components/material/CrearEnvioManual";
+import ClienteMisEnvios from "./views/ClientesMisEnvios";
+import { AuthProvider } from "./context/AuthProvider";
+import LayoutByRole from "./layout/LayoutByRole";
+import RegistroDiarioConFotos from "./components/material/RegistroDiarioConFoto";
 export default function App() {
   return (
     <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+      <AuthProvider>
       <Router>
         <Routes>
           {/* Públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Admin con layout */}
+          <Route
+  element={
+    <ProtectedRoute allowedRoles={["admin", "user", "client", "moto"]}>
+      <LayoutByRole />
+    </ProtectedRoute>
+  }
+
+
+
+    > 
+      {/* Admin con layout */}
           <Route
             path="/admin"
-            element={
-              <ProtectedRoute allowedRoles={["admin"]}>
-                <AppLayout />
-              </ProtectedRoute>
-            }
+           
           >
             <Route index element={<RegistrosPage />} />
             <Route path="crear-multiples" element={<CrearEnviosMultiplesM />} />
-            <Route path="crear-envios-ocr" element={<CrearEnviosOCR />} />
-            <Route path="crear-envios-ocr-v2" element={<CrearEnviosOCRV2 />} />
+          <Route path="crear-ocr" element={<RegistroDiarioConFotos/>} />
+             <Route path="crear-manual" element={<CrearEnvioManual />} />
             <Route path="envios" element={<VistaEnvios />} />
             <Route path="clientes" element={<VistaClientes />} />
+             <Route path="usuarios" element={<UsuariosAdmin />} />
             <Route path="clientes/:id" element={<VistaClienteById />} />
             <Route path="pagos" element={<VistaPagos />} />
             <Route path="crear-cliente" element={<CrearCliente />} />
             <Route path="tabla" element={<TablaAdmin />} />
-             <Route path="crear-repartidor" element={<CrearRepartidor />} />
+           
              <Route path="asignar-envios" element={<AsignarRepartidor />} />
               <Route path="confirmar-transferencia" element={<ConfirmarPagosTransferencia />} />
-               <Route path="registrar-pago-cc" element={<VistaCuentasCorrientes />} />
+            
                 <Route path="registros" element={<RegistrosPage />} />
           </Route>
 
@@ -69,26 +78,37 @@ export default function App() {
             path="/client"
             element={
               <ProtectedRoute allowedRoles={["client"]}>
-                <UserEnvios user={auth.currentUser} />
+               <ClienteMisEnvios/>
               </ProtectedRoute>
             }
-          />
+            >
+
+            <Route index element={<ClienteMisEnvios/>} />
+
+            </Route>
+            
+          
+          
 
           {/* Moto */}
           <Route
-            path="/moto"
+            path="/repartidor"
             element={
-              <ProtectedRoute allowedRoles={["moto"]}>
-                <MotoDashboard />
+              <ProtectedRoute allowedRoles={["repartidor"]}>
+                
               </ProtectedRoute>
             }
           />
-          <Route path="/moto/finalizados" element={<MotoFinalizados />} />
+        
+     </Route>
+          
+        
 
           {/* Catch-all → login */}
           <Route path="*" element={<Login />} />
         </Routes>
       </Router>
+      </AuthProvider>
     </SnackbarProvider>
   );
 }

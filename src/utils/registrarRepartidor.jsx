@@ -18,7 +18,7 @@ export async function registrarRepartidor({ nombre, telefono, email }) {
       nombre,
       telefono,
       email,
-      role: "moto",
+      role: "repartidor",
       creado: serverTimestamp(),
       uid: uid,
     });

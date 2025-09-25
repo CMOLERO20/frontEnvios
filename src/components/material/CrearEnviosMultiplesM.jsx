@@ -26,7 +26,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import obtenerPrecioPorZona from "../../utils/obtenerPrecioPorZona";
 import localidades from "../../utils/localidades";
-import { getClients } from "../../utils/getClients";
+import { getClients } from "../../utils/clientes";
 import { crearEnvios } from "../../utils/crearEnvio";
 import { useSnackbar } from "notistack";
 

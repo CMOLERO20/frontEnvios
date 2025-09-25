@@ -29,14 +29,15 @@ import {
 const drawerWidth = 260;
 
 const menuItems = [
-/*   {
+  {
     label: "Envíos",
     icon: <LocalShipping />,
     children: [
       { label: "Crear envíos", path: "/admin/crear-multiples" },
+       { label: "Crear envíos Manual", path: "/admin/crear-manual" },
       { label: "Ver envíos", path: "/admin/envios" },
     ],
-  }, */
+  },
    {
     label: "Registro",
     icon: <LocalShipping />,
@@ -51,6 +52,14 @@ const menuItems = [
     children: [
       { label: "Crear cliente", path: "/admin/crear-cliente" },
       { label: "Ver clientes", path: "/admin/clientes" },
+    ],
+  },
+  {
+    label: "Usuarios",
+    icon: <People />,
+    children: [
+      
+      { label: "Ver usuarios", path: "/admin/usuarios" },
     ],
   },
   {

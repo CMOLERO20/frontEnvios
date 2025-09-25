@@ -26,6 +26,7 @@ import {
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { subscribeRegistrosPorDia } from "../../utils/registros.jsx";
 import { eliminarRegistroYPagoById } from "../../utils/registros.jsx";
+import ModalFotosRegistro from "./ModalFotoRegistro";
 
 const currency = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -42,6 +43,8 @@ export default function RegistrosDelDia() {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [target, setTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [registroSeleccionado, setRegistroSeleccionado] = useState(null);
+const [modalAbierto, setModalAbierto] = useState(false);
 
   useEffect(() => {
     const f = new Date(fecha);
@@ -184,6 +187,17 @@ export default function RegistrosDelDia() {
                 <TableCell>{r.metodoPago}</TableCell>
                 <TableCell align="right">{currency.format(Number(r.montoTotal || 0))}</TableCell>
                 <TableCell>{r.notas || ""}</TableCell>
+                <TableCell>
+  <Button
+    variant="outlined"
+    onClick={() => {
+      setRegistroSeleccionado(r); // o registro.imagenes si preferís
+      setModalAbierto(true);
+    }}
+  >
+    Ver fotos
+  </Button>
+</TableCell>
                 <TableCell align="center">
                   <Tooltip title="Eliminar registro y pago">
                     <span>
@@ -206,6 +220,12 @@ export default function RegistrosDelDia() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <ModalFotosRegistro
+  open={modalAbierto}
+  onClose={() => setModalAbierto(false)}
+  imagenes={registroSeleccionado?.imagenes || []}
+/>
 
       {/* Confirmación eliminar */}
       <Dialog open={openConfirm} onClose={handleCloseConfirm} fullWidth maxWidth="xs">

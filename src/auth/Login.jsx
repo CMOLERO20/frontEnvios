@@ -28,6 +28,7 @@ export default function Login() {
         if (rol === "admin") navigate("/admin", { replace: true });
         if (rol === "client") navigate("/client", { replace: true });
         if (rol === "moto") navigate("/moto", { replace: true });
+        if (rol === "user") navigate("/user", { replace: true });
       }
     } catch (error) {
       console.error("Error al ingresar:", error);

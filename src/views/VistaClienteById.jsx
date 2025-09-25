@@ -1,7 +1,7 @@
 // src/pages/VistaClienteById.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getClient } from "../utils/getClients";
+import { getClient } from "../utils/clientes";
 import { getEnviosById } from "../utils/getEnvios";
 import { getPagosByClient } from "../utils/getPagos";
 import {

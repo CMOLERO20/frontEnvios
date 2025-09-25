@@ -1,13 +1,12 @@
 // src/views/VistaEnvios.jsx
 import { useState, useEffect } from "react";
 import { Container, Typography, Box, Paper } from "@mui/material";
-import FiltroBusqueda from "../components/elementos/FiltroBusqueda";
-import FiltroFecha from "../components/elementos/FiltroFecha";
-import BotonVolver from "../components/elementos/BotonVolver";
+
 import TablaAdmin from "../components/material/TablaAdmin";
 import ModalGenerico from "../components/elementos/ModalGenerico";
-import { getEnvios } from "../utils/getEnvios";
+
 import { obtenerEnvios } from "../api/crudEnvios";
+import { getEnvios } from "../utils/getEnvios";
 
 export default function VistaEnvios() {
   const [envios, setEnvios] = useState([]);
@@ -20,7 +19,7 @@ export default function VistaEnvios() {
 
   
  const fetchData = async () => {
-         const data = await obtenerEnvios();
+         const data = await getEnvios();
          setEnvios(data);
        };
     useEffect(() => {

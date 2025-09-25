@@ -10,8 +10,8 @@ import {
   Stack,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { editarCliente } from "../../utils/editarCliente";
 
+import  {updateClienteById} from "../../utils/clientes";
 export default function EditarClienteModal({ cliente, open, onClose, onGuardado }) {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
@@ -47,8 +47,10 @@ export default function EditarClienteModal({ cliente, open, onClose, onGuardado 
         email: email.trim(),
         telefono: telefono.trim(),
       };
+      console.log("🚀 ~ handleGuardar ~ datosActualizados:", datosActualizados)
 
-      await editarCliente(cliente.uid, datosActualizados);
+      await updateClienteById(cliente.id, datosActualizados);
+      console.log("🚀 ~ handleGuardar ~ datosActualizados:", datosActualizados)
       console.log("🚀 ~ handleGuardar ~ cliente.id:", cliente.id)
 
      
