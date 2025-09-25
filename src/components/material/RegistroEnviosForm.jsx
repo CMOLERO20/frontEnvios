@@ -150,7 +150,7 @@ export default function RegistroEnviosForm({ user }) {
               value={clienteSel}
               onChange={(_, value) => {
                 setClienteSel(value || null);
-                setClienteId(value?.uid || "");
+                setClienteId(value?.uid || value?.id || "");
                 setClienteNombre(value?.nombre || "");
               }}
               getOptionLabel={(opt) =>
@@ -168,7 +168,7 @@ export default function RegistroEnviosForm({ user }) {
                 />
               )}
               renderOption={(props, option) => (
-                <li {...props} key={option.uid}>
+                <li {...props} key={option.id}>
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <span>
                       <b>{option.nombre}</b>
