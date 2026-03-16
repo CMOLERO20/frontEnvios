@@ -8,7 +8,7 @@ import { db } from "../../firebase";
 import { useSnackbar } from "notistack";
 
 // Precios por zona
-const PRECIOS = { CABA: 3800, Z1: 6000, Z2: 7900, Z3: 8900 };
+const PRECIOS = { CABA: 3700, Z1: 5700, Z2: 7500, Z3: 8500 };
 
 export default function RegistroEnviosForm({ user }) {
   const [fecha, setFecha] = useState(() => new Date().toISOString().slice(0, 10));
