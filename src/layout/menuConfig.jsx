@@ -11,10 +11,10 @@ export const MENU_BY_ROLE = {
       icon: <Assessment />,
       children: [
         { label: "Registros", path: "/admin/registros" },
-         { label: "Registros Foto", path: "/admin/crear-ocr" },
+      //   { label: "Registros Foto", path: "/admin/crear-ocr" },
       ],
     },
-    {
+   /* {
       label: "Envíos",
       icon: <LocalShipping />,
       children: [
@@ -24,7 +24,7 @@ export const MENU_BY_ROLE = {
         { label: "OCR", path: "/admin/crear-envios-ocr" },
         { label: "OCR v2", path: "/admin/crear-envios-ocr-v2" }, */
       ],
-    },
+    }, 
     {
       label: "Clientes",
       icon: <People />,
